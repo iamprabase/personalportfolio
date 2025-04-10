@@ -1,0 +1,43 @@
+{% extends 'layout.twig' %}
+
+{% block title %}{{ article ? 'Edit' : 'New' }} Article{% endblock %}
+
+
+{% block content %}
+
+{% if errors %}
+  <div class="errors">
+      <ul>
+          {% for field, messages in errors %}
+              {% for message in messages %}
+                  <li>{{ field|capitalize }}: {{ message }}</li>
+              {% endfor %}
+          {% endfor %}
+      </ul>
+  </div>
+{% endif %}
+
+<h2>{{ article ? 'Edit' : 'New' }} Article</h2>
+
+<form action="{{ article ? '/admin/article/edit/' ~ article.id : '/admin/article/new' }}" method="post">
+    <input type="hidden" name="{{ csrf_token }}" value="{{ csrf_value }}">
+    
+    <label for="title">Title:</label>
+    <input type="text" name="title" id="title" value="{{ article.title | default('') }}" required>
+    
+    <label for="content">Content:</label>
+    <textarea name="content" id="content-editor" required>{{ article.content | default('') }}</textarea>
+    
+    <button type="submit">{{ article ? 'Update' : 'Create' }} Article</button>
+</form>
+
+<!-- TinyMCE Integration -->
+<script src="{{ base_url() }}/assets/js/tinymce/tinymce.min.js"></script>
+
+<script type="text/javascript">
+  tinymce.init({
+    selector: '#content-editor'
+  });
+</script>
+
+{% endblock %}

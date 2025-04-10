@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="{{ page.language|default('en') }}">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}{{ page.meta_title|default('Minimalist CMS') }}{% endblock %}</title>
+    <meta name="description" content="{{ page.meta_description|default('Author website CMS') }}">
+    <link rel="canonical" href="{{ page.canonical_url|default('http://example.com') }}">
+
+    <!-- Open Graph Tags -->
+    <meta property="og:title" content="{{ page.meta_title|default('Minimalist CMS') }}">
+    <meta property="og:description" content="{{ page.meta_description|default('Author website CMS') }}">
+    <meta property="og:url" content="{{ page.canonical_url|default('http://example.com') }}">
+    
+    <link rel="stylesheet" href="/assets/css/style.css">
+</head>
+<body>
+    <header>
+        <h1><a href="/">Minimalist CMS</a></h1>
+        <nav>
+            <a href="/">Home</a> 
+             {% if not user %}
+            | <a href="/login">Login</a> |
+            <a href="/register">Register</a>
+            {% else %}
+            | <a href="/logout">Logout</a>
+            {% endif %}
+        </nav>
+        <!-- Language Selector UI -->
+        <div class="language-selector">
+            <form action="/change-language" method="get">
+                <select name="lang" onchange="this.form.submit()">
+                    {% for lang in languages %}
+                        <option value="{{ lang.code }}" {% if lang.code == page.language %}selected{% endif %}>{{ lang.name }}</option>
+                    {% endfor %}
+                </select>
+            </form>
+        </div>
+    </header>
+    
+    <main>
+        {% block content %}{% endblock %}
+    </main>
+    
+    <footer>
+        <p>&copy; {{ "now"|date("Y") }} Author Website</p>
+    </footer>
+</body>
+</html>

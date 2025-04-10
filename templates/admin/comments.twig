@@ -1,0 +1,33 @@
+{% extends 'layout.twig' %}
+
+{% block title %}Manage Comments{% endblock %}
+
+{% block content %}
+<h2>Manage Comments</h2>
+<table>
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Content</th>
+            <th>Author</th>
+            <th>Created At</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for comment in comments %}
+            <tr>
+                <td>{{ comment.id }}</td>
+                <td>{{ comment.content }}</td>
+                <td>{{ comment.author }}</td>
+                <td>{{ comment.created_at }}</td>
+                <td>
+                    <form action="/admin/comment/delete/{{ comment.id }}" method="post" style="display:inline;">
+                        <button type="submit">Delete</button>
+                    </form>
+                </td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

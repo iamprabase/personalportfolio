@@ -1,0 +1,34 @@
+{% extends 'layout.twig' %}
+
+{% block title %}Register{% endblock %}
+
+{% block content %}
+
+{% if errors %}
+    <div class="errors">
+        <ul>
+            {% for field, messages in errors %}
+                {% for message in messages %}
+                    <li>{{ field|capitalize }}: {{ message }}</li>
+                {% endfor %}
+            {% endfor %}
+        </ul>
+    </div>
+{% endif %}
+<h2>Register</h2>
+<form action="/register" method="post">
+    <label for="username">Username:</label>
+    <input type="text" name="username" id="username" required>
+    
+    <label for="email">Email:</label>
+    <input type="email" name="email" id="email" required>
+    
+    <label for="password">Password:</label>
+    <input type="password" name="password" id="password" required>
+    
+    <label for="password_confirm">Confirm Password:</label>
+    <input type="password" name="password_confirm" id="password_confirm" required>
+    
+    <button type="submit">Register</button>
+</form>
+{% endblock %}
