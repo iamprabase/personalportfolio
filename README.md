@@ -4,6 +4,23 @@ This project is a web application for the author Jessica Jacobson. It includes f
 
 ---
 
+## Deliverables
+
+1. **Complete CMS Source Code**:
+   - Fully structured and commented source code for the CMS.
+   - Organized into controllers, models, views, middleware, and configuration files.
+
+2. **SQL Database Creation Script**:
+   - A script to create the required database schema for the application.
+
+3. **Documentation**:
+   - Installation and environment setup guide.
+   - Template integration guide.
+   - SEO settings guide.
+   - Language/content management overview.
+
+---
+
 ## Features
 
 - **Home Page**: Displays a list of articles.
@@ -27,6 +44,8 @@ htdocs/
 │   ├── Views/             # Twig templates
 │   ├── Config/            # Configuration files
 │   └── web/               # Route definitions
+├── database/              # SQL database creation scripts
+│   └── schema.sql         # Database schema
 ├── .env                   # Environment variables
 ├── composer.json          # Composer dependencies
 └── README.md              # Project documentation
@@ -34,16 +53,7 @@ htdocs/
 
 ---
 
-## Requirements
-
-- **PHP**: Version 8.0 or higher
-- **Composer**: Dependency manager for PHP
-- **MySQL**: Database for storing application data
-- **Web Server**: Apache or Nginx
-
----
-
-## Installation
+## Installation and Environment Setup
 
 1. **Clone the Repository**:
    ```bash
@@ -79,65 +89,57 @@ htdocs/
 
 ---
 
-## Configuration
+## Template Integration Guide
 
-### Environment Variables
+1. **Twig Templates**:
+   - All templates are located in the `src/Views/` directory.
+   - Use Twig syntax to render dynamic content in templates.
 
-The application uses a `.env` file for configuration. Below are the key variables:
+2. **Customizing Templates**:
+   - Modify existing templates (e.g., `layout.twig`, `article.twig`) to match the desired design.
+   - Add new templates for additional pages as needed.
 
-| Variable         | Description                          |
-|-------------------|--------------------------------------|
-| `DB_HOST`        | Database host (e.g., `127.0.0.1`)   |
-| `DB_NAME`        | Database name                       |
-| `DB_USER`        | Database username                   |
-| `DB_PASS`        | Database password                   |
-| `APP_DEBUG`      | Enable/disable debug mode           |
-| `META_TITLE`     | Default meta title for the website  |
-| `META_DESCRIPTION` | Default meta description          |
-| `CANONICAL_URL`  | Base URL of the website             |
-| `LANGUAGE`       | Default language (`en` or `fr`)     |
+3. **Assets**:
+   - Place CSS, JavaScript, and image files in the `public/assets/` directory.
+   - Reference assets in templates using the base URL.
 
 ---
 
-## Key Features
+## SEO Settings Guide
 
-### Language Switching
+1. **Meta Information**:
+   - Default meta title and description are configured in the `.env` file:
+     ```env
+     META_TITLE="Home - Author Website"
+     META_DESCRIPTION="Welcome to the author website"
+     ```
 
-- Users can switch between English and French using the `/change-language` route.
-- The selected language is stored in the session.
+2. **Canonical URL**:
+   - Set the base URL of the website in the `.env` file:
+     ```env
+     CANONICAL_URL="http://example.com/"
+     ```
 
-### Admin Dashboard
-
-- Accessible at `/admin`.
-- Requires admin authentication.
-- Features include:
-  - Article management (create, edit, delete).
-  - Comment moderation.
-
-### Authentication
-
-- Login: `/auth/login`
-- Registration: `/auth/register`
-- Logout: `/auth/logout`
+3. **Dynamic Meta Tags**:
+   - Meta tags for individual pages (e.g., articles) can be set dynamically in controllers.
 
 ---
 
-## Deployment
+## Language/Content Management Overview
 
-1. **Set Up a Web Server**:
-   - Configure Apache or Nginx to point to the `public/` directory as the document root.
+1. **Language Switching**:
+   - Users can switch between English and French using the `/change-language` route.
+   - The selected language is stored in the session.
 
-2. **Set Up Environment Variables**:
-   - Ensure the `.env` file is configured for the production environment.
+2. **Content Localization**:
+   - Store localized content (e.g., article titles, descriptions) in the database with a `language` column.
+   - Query content based on the selected language.
 
-3. **Enable Debugging (Optional)**:
-   - Set `APP_DEBUG=false` in the `.env` file for production.
-
-4. **Run Database Migrations**:
-   - Import the SQL schema into the production database.
-
-5. **Restart the Server**:
-   - Restart your web server to apply changes.
+3. **Default Language**:
+   - Set the default language in the `.env` file:
+     ```env
+     LANGUAGE="en"
+     ```
 
 ---
 

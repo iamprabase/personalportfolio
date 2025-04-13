@@ -34,21 +34,20 @@ class ArticleController extends BaseController {
 
     // Home page: list all articles
     public function index(ServerRequestInterface $request, ResponseInterface $response): ResponseInterface {
-        if(isset($_SESSION['user']) && $_SESSION['user']['is_admin']) {
-          return $response->withHeader('Location', '/admin')->withStatus(302);
-        }
-        $articles = $this->articleModel->getAllArticles();
+        $queryParams = $request->getQueryParams();
+        $page = isset($queryParams['page']) ? (int)$queryParams['page'] : 1;
+        $perPage = 2; // Number of articles per page
+
+        $articles = $this->articleModel->getPaginatedArticles($page, $perPage);
+        $totalArticles = $this->articleModel->getTotalArticles();
+
+        $totalPages = ceil($totalArticles / $perPage);
 
         return $this->view->render($response, 'index.twig', [
-          'articles' => $articles,
-            // Optionally include default meta data for SEO
-            'page'      => [
-                'meta_title'        => self::$config['meta_title'],
-                'meta_description'  => self::$config['meta_description'],
-                'canonical_url'     => self::$config['canonical_url'],
-                'language'          => self::$config['language'],
-            ]
-          ]);
+            'articles' => $articles,
+            'currentPage' => $page,
+            'totalPages' => $totalPages,
+        ]);
     }
 
     // View a single article by its slug

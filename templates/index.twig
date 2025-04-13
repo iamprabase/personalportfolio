@@ -5,7 +5,7 @@
 {% block content %}
 
 <h1>{{ trans('articles') }}</h1>
-<ul>
+{# <ul>
     {% for article in articles %}
         <li>
             <a href="/article/{{ article.slug }}">{{ article.title }}</a>
@@ -14,5 +14,34 @@
     {% else %}
         <li>No articles found.</li>
     {% endfor %}
-</ul>
+</ul> #}
+
+<!-- filepath: /home/prabesh_shahi/Documents/devilbox/data/www/jessicajacobson/htdocs/templates/index.twig -->
+<!-- ...existing code... -->
+<section class="articles">
+    {% for article in articles %}
+        <article>
+            <h2><a href="/article/{{ article.slug }}">{{ article.title }}</a></h2>
+            <p><em>Published on {{ article.created_at|date("F j, Y") }}</em></p>
+            <p>{{ article.excerpt }}</p>
+        </article>
+    {% else %}
+        <p>No articles found.</p>
+    {% endfor %}
+</section>
+
+<nav class="pagination">
+    {% if currentPage > 1 %}
+        <a href="?page={{ currentPage - 1 }}">Previous</a>
+    {% endif %}
+
+    {% for page in 1..totalPages %}
+        <a href="?page={{ page }}" class="{{ page == currentPage ? 'active' : '' }}">{{ page }}</a>
+    {% endfor %}
+
+    {% if currentPage < totalPages %}
+        <a href="?page={{ currentPage + 1 }}">Next</a>
+    {% endif %}
+</nav>
+<!-- ...existing code... -->
 {% endblock %}

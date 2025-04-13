@@ -53,4 +53,20 @@ class ArticleModel extends BaseModel {
         $sql = "DELETE FROM articles WHERE id = ?";
         return $this->execute($sql, [$id]);
     }
+
+    public function getPaginatedArticles(int $page, int $perPage): array {
+        $offset = ($page - 1) * $perPage;
+        $query = "SELECT * FROM articles ORDER BY publication_date DESC LIMIT :limit OFFSET :offset";
+        $stmt = $this->pdo->prepare($query); // Use $this->pdo for consistency
+        $stmt->bindValue(':limit', $perPage, \PDO::PARAM_INT);
+        $stmt->bindValue(':offset', $offset, \PDO::PARAM_INT);
+        $stmt->execute();
+        return $stmt->fetchAll(\PDO::FETCH_ASSOC);
+    }
+
+    public function getTotalArticles(): int {
+        $query = "SELECT COUNT(*) as total FROM articles";
+        $stmt = $this->pdo->query($query); // Use $this->pdo for consistency
+        return (int)$stmt->fetch(\PDO::FETCH_ASSOC)['total'];
+    }
 }

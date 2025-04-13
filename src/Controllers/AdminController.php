@@ -90,7 +90,7 @@ class AdminController extends BaseController {
 
         $this->flash->addMessage('success', 'Article created successfully!');
         
-        return $response->withHeader('Location', '/admin/article')->withStatus(302);
+        return $response->withHeader('Location', '/admin')->withStatus(302);
     }
 
     public function edit(ServerRequestInterface $request, ResponseInterface $response, array $args): ResponseInterface {
