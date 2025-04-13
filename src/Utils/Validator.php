@@ -30,7 +30,10 @@ class Validator {
 
             if (str_starts_with($rule, 'mimes:')) {
                 $allowedMimes = explode(',', str_replace('mimes:', '', $rule));
-                if (!in_array($value->getClientMediaType(), $allowedMimes)) {
+                
+                $uploadedMime = explode('image/', $value->getClientMediaType())[1];
+
+                if (!in_array($uploadedMime, $allowedMimes)) {
                     $this->addError($field, 'Invalid file type. Only png, jpg, jpeg are allowed with maximum upload size of 2MB.');
                 }
             }

@@ -9,7 +9,7 @@ CREATE TABLE articles (
     meta_description TEXT,
     canonical_url VARCHAR(255),
     language VARCHAR(10) DEFAULT 'en',
-    featured_image VARCHAR(255),  -- URL or relative path to the featured_image
+    featured_image VARCHAR(255)  -- URL or relative path to the featured_image
 );
 
 -- Pages table
@@ -43,7 +43,7 @@ CREATE TABLE users (
     password VARCHAR(255) NOT NULL,
     email VARCHAR(255) UNIQUE NOT NULL,
     registration_date DATETIME DEFAULT CURRENT_TIMESTAMP,
-    profile_picture VARCHAR(255),  -- URL or relative path to the profile_picture
+    profile_picture VARCHAR(255)  -- URL or relative path to the profile_picture
 );
 
 -- Comments table
@@ -54,5 +54,5 @@ CREATE TABLE comments (
     comment_text TEXT NOT NULL,
     comment_date DATETIME DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (article_id) REFERENCES articles(id) ON DELETE CASCADE,
-    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );

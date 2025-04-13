@@ -24,6 +24,8 @@ class AuthController extends BaseController {
         $valueKey = $this->csrf->getTokenValueKey();
         $name = $request->getAttribute($nameKey);
         $value = $request->getAttribute($valueKey);
+        $this->csrf->setPersistentTokenMode(true);
+
         // Pass the CSRF token to the view
         $this->view->getEnvironment()->addGlobal('csrf', [
             'token_name_key' => $nameKey,
@@ -84,6 +86,8 @@ class AuthController extends BaseController {
         $name = $request->getAttribute($nameKey);
         $value = $request->getAttribute($valueKey);
         // Pass the CSRF token to the view
+
+        $this->csrf->setPersistentTokenMode(true);
         $this->view->getEnvironment()->addGlobal('csrf', [
             'token_name_key' => $nameKey,
             'token_value_key' => $valueKey,
@@ -117,6 +121,8 @@ class AuthController extends BaseController {
         $validator = new Validator();
         if (!$validator->validate($data, $rules)) {
             $errors = $validator->getErrors();
+            $this->addCsrfToView($request); 
+
             return $this->view->render($response, 'register.twig', [
                 'errors' => $errors,
                 'data'   => $data // Pass back the input data to pre-fill the form
@@ -138,6 +144,7 @@ class AuthController extends BaseController {
 
         // Check if user already exists
         if ($this->userModel->getUserByUsername($data['username'])) {
+            $this->addCsrfToView($request); 
             return $this->view->render($response, 'register.twig', [
                 'errors' => ['username' => ['Username already taken.']],
                 'data'   => $data // Pass back the input data to pre-fill the form
@@ -148,6 +155,7 @@ class AuthController extends BaseController {
         $hashedPassword = password_hash($data['password'], PASSWORD_DEFAULT);
         $userId = $this->userModel->registerUser($data['username'], $data['email'], $hashedPassword, $profilePicturePath);
         if (!$userId) {
+            $this->addCsrfToView($request); 
             return $this->view->render($response, 'register.twig', [
                 'errors' => ['general' => ['Registration failed. Please try again.']],
                 'data'   => $data // Pass back the input data to pre-fill the form
@@ -159,7 +167,8 @@ class AuthController extends BaseController {
             'id'       => $userId,
             'username' => $data['username'],
             'email'    => $data['email'],
-            'profile_picture'    => $profilePicturePath
+            'profile_picture'    => $profilePicturePath,
+            'is_admin' => false
         ];
 
         // Redirect to home or profile

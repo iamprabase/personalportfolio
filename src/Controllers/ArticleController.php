@@ -62,9 +62,16 @@ class ArticleController extends BaseController {
         }
         $comments = $this->commentModel->getCommentsByArticleId($article['id']);
 
+        $current_user_id = $_SESSION['user']['id'] ?? null;
+        $is_admin = $_SESSION['user']['is_admin'] ? true : false;
+
+        $this->addCsrfToView($request); // Use the method from BaseController
+
         return $this->view->render($response, 'article.twig', [
           'article' => $article,
           'comments'=> $comments,
+          'current_user_id' => $current_user_id,
+          'is_admin' => $is_admin,
             // Pass page meta for SEO/Open Graph tag rendering
             'page'     => [
                 'meta_title'        => $article['meta_title'],

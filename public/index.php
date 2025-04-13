@@ -52,7 +52,18 @@ $responseFactory = $app->getResponseFactory();
 
 // Register Middleware On Container
 $container->set('csrf', function () use ($responseFactory) {
-    return new Guard($responseFactory);
+  
+  $token_storage = null;
+
+  return new Guard(
+      $responseFactory,
+      'csrf_token',
+      $token_storage,
+      null,
+      200,
+      16,
+      true
+  );
 });
 
 // Register Middleware To Be Executed On All Routes

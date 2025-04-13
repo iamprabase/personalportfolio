@@ -29,6 +29,7 @@ class CsrfMiddleware implements MiddlewareInterface
             'token_value'    => $this->csrf->getTokenValue(),
         ]);
 
+        $this->csrf->setPersistentTokenMode(true);
         return $handler->handle($request);
     }
 }

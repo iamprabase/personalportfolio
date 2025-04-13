@@ -37,6 +37,13 @@ class ArticleModel extends BaseModel {
         return $stmt->fetch() ?: null;
     }
 
+
+     public function getArticleByCommentId($id): ?array {
+        $stmt = $this->pdo->prepare("SELECT articles.* FROM articles a INNER JOIN comments c ON c.article_id = a.id AND c.id = \'?'\ WHERE c.article_id = ?");
+        $stmt->execute([$id, $id]);
+        return $stmt->fetch() ?: null;
+    }
+
     public function updateArticle(int $id, string $title, string $content, string $slug, string $featuredImage = null): bool {
         $sql = "UPDATE articles SET title = ?, content = ?, slug = ?, featured_image = ? WHERE id = ?";
         return $this->execute($sql, [$title, $content, $slug, $featuredImage, $id]);

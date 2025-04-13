@@ -19,7 +19,7 @@
 
 <h2>{{ article ? 'Edit' : 'Create' }} Article</h2>
 
-<form action="{{ article.id is defined ? (base_url() ~ '/admin/article/edit/' ~ article.id) : (base_url() ~ '/admin/article/create') }}" method="post">
+<form action="{{ article.id is defined ? (base_url() ~ '/admin/article/edit/' ~ article.id) : (base_url() ~ '/admin/article/create') }}" method="post" enctype="multipart/form-data">
 
     <input type="hidden" name="{{ csrf.token_name_key }}" value="{{ csrf.token_name }}">
     <input type="hidden" name="{{ csrf.token_value_key }}" value="{{ csrf.token_value }}">
@@ -41,21 +41,20 @@
 
 <script type="text/javascript">
   // Ensure TinyMCE is initialized when the page loads
-    window.onload = function() {
-      debugger;
-        tinymce.init({
-            selector: '#content-editor', // The textarea you want to turn into TinyMCE
-            plugins: 'advlist autolink lists link image charmap print preview',
-            toolbar: 'undo redo | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist | link image',
-            menubar: false,
-            setup: function(editor) {
-                // Set the content from the backend (Twig variable)
-                editor.on('init', function() {
-                    editor.setContent('{{ content|escape('js') }}');
-                });
-            }
-        });
-    };
+  window.onload = function() {
+      tinymce.init({
+          selector: '#content-editor', // The textarea you want to turn into TinyMCE
+          plugins: 'advlist autolink lists link image charmap print preview',
+          toolbar: 'undo redo | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist | link image',
+          menubar: false,
+          setup: function(editor) {
+              // Set the content from the backend (Twig variable)
+              editor.on('init', function() {
+                  editor.setContent(`{{ article.content | default('') | escape('js') }}`);
+              });
+          }
+      });
+  };
 </script>
 
 {% endblock %}

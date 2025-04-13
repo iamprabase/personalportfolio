@@ -53,6 +53,14 @@ return function ($container) {
         return $controller;
     });
 
+    // In your container configuration, set up the controller:
+    $container->set(\App\Controllers\CommentController::class, function($container) {
+        $controller = new \App\Controllers\CommentController($container->get('csrf'));
+        $controller->setView($container->get('view'));  // 'view' is registered as Twig in the container.
+        $controller->setFlash($container->get(Messages::class));  
+        return $controller;
+    });
+
     // Retrieve the db settings from the container
     $settings = $container->get('settings');
     // Pass the db configuration array to your Database class.

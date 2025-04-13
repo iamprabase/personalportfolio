@@ -1,11 +1,14 @@
 <?php
 use Slim\App;
+
 use App\Controllers\ArticleController;
 use App\Controllers\AuthController;
+use App\Controllers\CommentController;
 use App\Controllers\AdminController;
 use App\Controllers\PageController;
-use App\Middleware\AdminMiddleware;
 
+use App\Middleware\AdminMiddleware;
+use App\Middleware\AuthMiddleware;
 
 return function (App $app) {
     // Home page: list articles
@@ -24,7 +27,15 @@ return function (App $app) {
     $app->get('/pages', PageController::class . ':index');  // List all pages
     $app->get('/page/{slug}', PageController::class . ':show');  // Show a page by slug
 
-    
+
+    // Comment: Article Comments
+    // Admin Routes (protected by AuthMiddleware)
+    $app->group('', function ($group) {
+      $group->post('/comments/{article_id}/store', [CommentController::class, 'store']); // Ensure this is defined only once
+      $group->post('/comments/{id}/update', [CommentController::class, 'update']);
+      $group->post('/comments/{id}/delete', [CommentController::class, 'delete']);
+    })->add(new AuthMiddleware());
+
     // Admin Routes (protected by AuthMiddleware)
     $app->group('/admin', function ($group) {
         $group->get('', [AdminController::class, 'dashboard']);
@@ -33,6 +44,5 @@ return function (App $app) {
         $group->get('/article/edit/{id}', [AdminController::class, 'edit']);
         $group->post('/article/edit/{id}', [AdminController::class, 'update']);
         $group->post('/article/delete/{id}', [AdminController::class, 'delete']);
-        $group->get('/comments', [AdminController::class, 'manageComments']);
     })->add(new AdminMiddleware());
 };
