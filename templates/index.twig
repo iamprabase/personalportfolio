@@ -3,6 +3,18 @@
 {% block title %}Home{% endblock %}
 
 {% block content %}
+<nav>
+    <ul>
+        {% for lang in languages %}
+            <li>
+                <a href="?lang={{ lang.code }}" class="{{ lang.code == selected_language ? 'active' : '' }}">
+                    {{ lang.name }}
+                </a>
+            </li>
+        {% endfor %}
+    </ul>
+</nav>
+
 <h2>Articles</h2>
 <ul>
     {% for article in articles %}

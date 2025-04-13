@@ -168,6 +168,10 @@ class AuthController extends BaseController {
 
     public function updateProfile(ServerRequestInterface $request, ResponseInterface $response, array $args): ResponseInterface {
         $id = $args['id'];
+        if($id != $_SESSION['user']['id'] && !$_SESSION['user']['is_admin']) {
+            return $response->withHeader('Location', '/')->withStatus(302);
+        }
+
         $data = $request->getParsedBody();
         $uploadedFiles = $request->getUploadedFiles();
 

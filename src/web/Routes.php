@@ -6,6 +6,7 @@ use App\Controllers\AuthController;
 use App\Controllers\CommentController;
 use App\Controllers\AdminController;
 use App\Controllers\PageController;
+use App\Controllers\LanguageController;
 
 use App\Middleware\AdminMiddleware;
 use App\Middleware\AuthMiddleware;
@@ -16,12 +17,13 @@ return function (App $app) {
     // Article detail page, using slug for clean URL
     $app->get('/article/{slug}', [ArticleController::class, 'view']);
 
-     // Authentication Routes
+    // Authentication Routes
     $app->get('/login', [AuthController::class, 'showLogin']);
     $app->post('/login', [AuthController::class, 'login']);
     $app->get('/register', [AuthController::class, 'showRegister']);
     $app->post('/register', [AuthController::class, 'register']);
 
+    // Page Routes
     $app->get('/pages', PageController::class . ':index');  // List all pages
     $app->get('/page/{slug}', PageController::class . ':show');  // Show a page by slug
 
@@ -36,7 +38,7 @@ return function (App $app) {
       $group->post('/comments/{id}/delete', [CommentController::class, 'delete']);
     })->add(new AuthMiddleware());
 
-    // Admin Routes (protected by AuthMiddleware)
+    // Admin Routes (protected by AdminMiddleware)
     $app->group('/admin', function ($group) {
         $group->get('', [AdminController::class, 'dashboard']);
         $group->get('/article/create', [AdminController::class, 'create']);
