@@ -37,14 +37,11 @@ class AdminController extends BaseController {
 
     public function dashboard(ServerRequestInterface $request, ResponseInterface $response): ResponseInterface {
       $articles = $this->articleModel->getAllArticles();
-        // Load available languages for the UI (for example, from the languages table)
-        $languages = $this->languageModel->getAllLanguages();
 
         $this->addCsrfToView($request); // Use the method from BaseController
 
         return $this->view->render($response, 'admin/dashboard.twig', [
           'articles' => $articles,
-          'languages' => $languages,
             // Optionally include default meta data for SEO
             'page'      => [
                 'meta_title'        => self::$config['meta_title'],

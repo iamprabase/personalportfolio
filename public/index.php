@@ -15,6 +15,7 @@ require __DIR__ . '/../vendor/autoload.php';
 if (session_status() === PHP_SESSION_NONE) {
   session_start();
 }
+\App\Helpers\Translator::load();
 
 $dotenv = Dotenv::createImmutable(__DIR__ . '/../');
 $dotenv->load();
@@ -27,6 +28,10 @@ $container->set('view', function () {
     $twig = Twig::create(__DIR__ . '/../templates', [
         'cache' => false, // or provide a cache dir in production
     ]);
+
+    $twig->getEnvironment()->addFunction(new \Twig\TwigFunction('trans', function ($key) {
+      return \App\Helpers\Translator::get($key);
+    }));
 
     // Add flash messages globally
     if (isset($_SESSION['slimFlash'])) {
@@ -42,6 +47,14 @@ $container->set('view', function () {
     $twig->getEnvironment()->addFunction(new \Twig\TwigFunction('base_url', function () {
         return rtrim((isset($_SERVER['HTTPS']) ? "https" : "http") . "://" . $_SERVER['HTTP_HOST'], '/');
     }));
+
+    // Inject languages + current language globally
+    $languageModel = new \App\Models\LanguageModel();
+    $languages = $languageModel->getAllLanguages();
+    $currentLang = $_SESSION['lang'] ?? 'fr';
+
+    $twig->getEnvironment()->addGlobal('languages', $languages);
+    $twig->getEnvironment()->addGlobal('pageLanguage', $currentLang);
 
     return $twig;
 });
@@ -74,6 +87,7 @@ $app->add('csrf');
 
 // Register Twig Middleware
 $app->add(TwigMiddleware::createFromContainer($app));
+$app->add(\App\Middleware\LanguageMiddleware::class);
 
 (require __DIR__ . '/../src/web/Routes.php')($app);
 

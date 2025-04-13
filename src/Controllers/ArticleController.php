@@ -38,12 +38,9 @@ class ArticleController extends BaseController {
           return $response->withHeader('Location', '/admin')->withStatus(302);
         }
         $articles = $this->articleModel->getAllArticles();
-        // Load available languages for the UI (for example, from the languages table)
-        $languages = $this->languageModel->getAllLanguages();
 
         return $this->view->render($response, 'index.twig', [
           'articles' => $articles,
-          'languages' => $languages,
             // Optionally include default meta data for SEO
             'page'      => [
                 'meta_title'        => self::$config['meta_title'],

@@ -3,17 +3,6 @@
 {% block title %}{{ article.title }}{% endblock %}
 
 {% block content %}
-<nav>
-    <ul>
-        {% for lang in languages %}
-            <li>
-                <a href="?lang={{ lang.code }}" class="{{ lang.code == selected_language ? 'active' : '' }}">
-                    {{ lang.name }}
-                </a>
-            </li>
-        {% endfor %}
-    </ul>
-</nav>
 
 <article>
     <h2>{{ article.title }}</h2>

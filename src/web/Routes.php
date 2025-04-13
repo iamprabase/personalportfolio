@@ -6,7 +6,6 @@ use App\Controllers\AuthController;
 use App\Controllers\CommentController;
 use App\Controllers\AdminController;
 use App\Controllers\PageController;
-use App\Controllers\LanguageController;
 
 use App\Middleware\AdminMiddleware;
 use App\Middleware\AuthMiddleware;
@@ -16,6 +15,26 @@ return function (App $app) {
     $app->get('/', [ArticleController::class, 'index']);
     // Article detail page, using slug for clean URL
     $app->get('/article/{slug}', [ArticleController::class, 'view']);
+
+    // In routes/web.php or wherever your routes are defined
+    $app->get('/change-language', function ($request, $response, $args) {
+        $params = $request->getQueryParams();
+        $lang = $params['lang'] ?? 'en';
+
+        // Validate language
+        if (!in_array($lang, ['en', 'fr'])) {
+            $lang = 'en';
+        }
+
+        // Set language in session
+        $_SESSION['lang'] = $lang;
+
+        // Redirect back (or to home if no referrer)
+        $referer = $request->getServerParams()['HTTP_REFERER'] ?? '/';
+        return $response
+            ->withHeader('Location', $referer)
+            ->withStatus(302);
+    });
 
     // Authentication Routes
     $app->get('/login', [AuthController::class, 'showLogin']);

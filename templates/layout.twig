@@ -31,16 +31,16 @@
             | <a href="/logout">Logout</a>
             {% endif %}
         </nav>
-        <!-- Language Selector UI -->
-        <div class="language-selector">
-            <form action="/change-language" method="get">
-                <select name="lang" onchange="this.form.submit()">
-                    {% for lang in languages %}
-                        <option value="{{ lang.code }}" {% if lang.code == page.language %}selected{% endif %}>{{ lang.name }}</option>
-                    {% endfor %}
-                </select>
-            </form>
-        </div>
+                
+        <form action="/change-language" method="get">
+          <select name="lang" onchange="this.form.submit()">
+            {% for lang in languages %}
+              <option value="{{ lang.code }}" {% if lang.code == pageLanguage %}selected{% endif %}>{{ lang.name }}</option>
+            {% endfor %}
+          </select>
+        </form>
+
+
     </header>
     
     <main>
