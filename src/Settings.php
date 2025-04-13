@@ -1,4 +1,10 @@
 <?php
+
+use App\Middleware\CsrfMiddleware;
+use Slim\Csrf\Guard;
+use Slim\Views\Twig;
+use Slim\Flash\Messages;
+
 return function ($container) {
     $container->set('settings', function () {
         return [
@@ -21,10 +27,41 @@ return function ($container) {
         ];
     });
 
+    $container->set(Guard::class, function() use ($container) {
+      $app = \Slim\Factory\AppFactory::create(); // only for ResponseFactory
+      $guard = new Guard($app->getResponseFactory());
+
+      $guard->setFailureHandler(function ($request, $handler) use ($container) {
+          $flash = $container->get(\Slim\Flash\Messages::class);
+          $flash->addMessage('error', 'Invalid CSRF token, please try again.');
+          $response = new \Slim\Psr7\Response();
+          return $response
+              ->withHeader('Location', '/')
+              ->withStatus(302);
+      });
+
+      return $guard;
+    });
+
+
+    // Register CsrfMiddleware
+    $container->set(CsrfMiddleware::class, function($container) {
+        return new CsrfMiddleware(
+            $container->get(Guard::class),
+            $container->get('view')
+        );
+    });
+
+
+    $container->set(Messages::class, function () {
+      return new Messages();
+    });
+
     // In your container configuration, set up the controller:
     $container->set(\App\Controllers\ArticleController::class, function($container) {
         $controller = new \App\Controllers\ArticleController();
         $controller->setView($container->get('view'));  // 'view' is registered as Twig in the container.
+        $controller->setFlash($container->get(Messages::class));  
         return $controller;
     });
 
@@ -32,6 +69,7 @@ return function ($container) {
     $container->set(\App\Controllers\AdminController::class, function($container) {
         $controller = new \App\Controllers\AdminController();
         $controller->setView($container->get('view'));  // 'view' is registered as Twig in the container.
+        $controller->setFlash($container->get(Messages::class));  
         return $controller;
     });
 
@@ -39,6 +77,7 @@ return function ($container) {
     $container->set(\App\Controllers\AuthController::class, function($container) {
         $controller = new \App\Controllers\AuthController();
         $controller->setView($container->get('view'));  // 'view' is registered as Twig in the container.
+        $controller->setFlash($container->get(Messages::class));  
         return $controller;
     });
 

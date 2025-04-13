@@ -1,11 +1,13 @@
 <?php
 namespace App\Controllers;
 
+use App\Utils\Validator;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use App\Models\ArticleModel;
 use App\Models\PageModel;       // A new model for pages (see note below)
 use App\Models\CommentModel;
+use Cocur\Slugify\Slugify;
 
 class AdminController extends BaseController {
     protected $articleModel;
@@ -22,46 +24,54 @@ class AdminController extends BaseController {
         return $this->view->render($response, 'admin/dashboard.twig');
     }
     
-    public function newArticle(ServerRequestInterface $request, ResponseInterface $response): ResponseInterface {
-        return $this->view->render($response, 'admin/edit_article.twig', ['article' => null]);
+    public function create(ServerRequestInterface $request, ResponseInterface $response): ResponseInterface {
+        return $this->view->render($response, 'admin/article_form.twig', ['article' => null]);
     }
     
-    public function createArticle(ServerRequestInterface $request, ResponseInterface $response): ResponseInterface {
+    public function store(ServerRequestInterface $request, ResponseInterface $response): ResponseInterface {
         $data = $request->getParsedBody();
 
         // Define validation rules
         $rules = [
             'title' => 'required|min:3|max:255',
             'content' => 'required|min:10',
-            'slug' => 'required|alpha_dash|min:3|max:100'
         ];
 
         // Validate input
         $validator = new Validator();
         if (!$validator->validate($data, $rules)) {
             $errors = $validator->getErrors();
-            return $this->view->render($response, 'admin/edit_article.twig', [
+            return $this->view->render($response, 'admin/article_form.twig', [
                 'errors' => $errors,
                 'article' => $data // Pre-fill the form with the submitted data
             ]);
         }
 
+        // Create a Slugify instance
+        $slugify = new Slugify();
+
+        // Generate a slug from a title
+        $slug = $slugify->slugify($data['title']);
+
+        $data['slug'] = $slug;
+
         $this->articleModel->createArticle($data['title'], $data['content'], $data['slug']);
+        
         $response->getBody()->write("Article created successfully!");
         return $response;
     }
     
-    public function editArticle(ServerRequestInterface $request, ResponseInterface $response, array $args): ResponseInterface {
+    public function edit(ServerRequestInterface $request, ResponseInterface $response, array $args): ResponseInterface {
         $id = $args['id'];
         $article = $this->articleModel->getArticleById($id);
         if (!$article) {
             $response->getBody()->write("Article not found");
             return $response->withStatus(404);
         }
-        return $this->view->render($response, 'admin/edit_article.twig', ['article' => $article]);
+        return $this->view->render($response, 'admin/article_form.twig', ['article' => $article]);
     }
     
-    public function updateArticle(ServerRequestInterface $request, ResponseInterface $response, array $args): ResponseInterface {
+    public function update(ServerRequestInterface $request, ResponseInterface $response, array $args): ResponseInterface {
         $id = $args['id'];
         $data = $request->getParsedBody();
 
@@ -77,7 +87,7 @@ class AdminController extends BaseController {
         if (!$validator->validate($data, $rules)) {
             $errors = $validator->getErrors();
             $article = $this->articleModel->getArticleById($id);
-            return $this->view->render($response, 'admin/edit_article.twig', [
+            return $this->view->render($response, 'admin/article_form.twig', [
                 'errors' => $errors,
                 'article' => array_merge($article, $data) // Merge existing data with submitted data
             ]);
@@ -89,7 +99,7 @@ class AdminController extends BaseController {
         return $response;
     }
     
-    public function deleteArticle(ServerRequestInterface $request, ResponseInterface $response, array $args): ResponseInterface {
+    public function delete(ServerRequestInterface $request, ResponseInterface $response, array $args): ResponseInterface {
         $id = $args['id'];
         $this->articleModel->deleteArticle($id);
         $response->getBody()->write("Article deleted successfully!");

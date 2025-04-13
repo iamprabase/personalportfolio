@@ -17,7 +17,7 @@ class AdminMiddleware {
         elseif(isset($_SESSION['user']) && !isset($_SESSION['user']['is_admin'])) {
             // Redirect to home if not an admin
             $response = new \Slim\Psr7\Response();
-            session_destroy();
+            // session_destroy();
             return $response->withHeader('Location', '/')->withStatus(302);
         }
 

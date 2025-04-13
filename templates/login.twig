@@ -18,7 +18,10 @@
     </div>
 {% endif %}
 <h2>Login</h2>
-<form action="/login" method="post">
+<form action="{{base_url() ~ '/login'}}" method="post">
+    <input type="hidden" name="{{ csrf.token_name_key }}" value="{{ csrf.token_name }}">
+    <input type="hidden" name="{{ csrf.token_value_key }}" value="{{ csrf.token_value }}">
+    
     <label for="username">Username:</label>
     <input type="text" name="username" id="username" required>
     

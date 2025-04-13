@@ -56,6 +56,7 @@ class AuthController extends BaseController {
 
         $is_admin = $_SESSION['user']['is_admin'];
 
+        $this->flash->addMessage('success', 'Login successful!');
         // Redirect to home or profile
         return $response->withHeader('Location', $is_admin ? '/admin' : '/admin')->withStatus(302);
     }

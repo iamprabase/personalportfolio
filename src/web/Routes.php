@@ -28,11 +28,11 @@ return function (App $app) {
     // Admin Routes (protected by AuthMiddleware)
     $app->group('/admin', function ($group) {
         $group->get('', [AdminController::class, 'dashboard']);
-        $group->get('/article/new', [AdminController::class, 'newArticle']);
-        $group->post('/article/new', [AdminController::class, 'createArticle']);
-        $group->get('/article/edit/{id}', [AdminController::class, 'editArticle']);
-        $group->post('/article/edit/{id}', [AdminController::class, 'updateArticle']);
-        $group->post('/article/delete/{id}', [AdminController::class, 'deleteArticle']);
+        $group->get('/article/create', [AdminController::class, 'create']);
+        $group->post('/article/create', [AdminController::class, 'store']);
+        $group->get('/article/edit/{id}', [AdminController::class, 'edit']);
+        $group->post('/article/edit/{id}', [AdminController::class, 'update']);
+        $group->post('/article/delete/{id}', [AdminController::class, 'delete']);
         $group->get('/comments', [AdminController::class, 'manageComments']);
     })->add(new AdminMiddleware());
 };

@@ -1,18 +1,18 @@
 <?php
 
-require __DIR__ . '/../vendor/autoload.php';
 
-use Slim\Csrf\Guard;
 use Slim\Factory\AppFactory;
-use Psr\Http\Message\ResponseFactoryInterface;
-use Dotenv\Dotenv;
-use DI\Container;
 use Slim\Views\Twig;
 use Slim\Views\TwigMiddleware;
+use Dotenv\Dotenv;
+use DI\Container;
+use App\Middleware\CsrfMiddleware;
+
+require __DIR__ . '/../vendor/autoload.php';
 
 // Start PHP session
 if (session_status() === PHP_SESSION_NONE) {
-    session_start();
+  session_start();
 }
 
 $dotenv = Dotenv::createImmutable(__DIR__ . '/../');
@@ -21,22 +21,18 @@ $dotenv->load();
 // Create Container and set settings
 $container = new Container();
 
-// Add CSRF Guard to the container
-$container->set('csrf', function () use ($container) {
-    $responseFactory = $container->get(ResponseFactoryInterface::class);
-    return new Guard($responseFactory);
-});
-
-// Add ResponseFactoryInterface to the container
-$container->set(ResponseFactoryInterface::class, function () {
-    return AppFactory::determineResponseFactory();
-});
-
 // Add Twig to container
 $container->set('view', function () {
     $twig = Twig::create(__DIR__ . '/../templates', [
         'cache' => false, // or provide a cache dir in production
     ]);
+
+    // Add flash messages globally
+    if (isset($_SESSION['slimFlash'])) {
+        $messages = $_SESSION['slimFlash'];
+        $twig->getEnvironment()->addGlobal('flash', $messages);
+        unset($_SESSION['slimFlash']);
+    }
 
     // Add the `user` global variable to Twig before the environment is locked
     $twig->getEnvironment()->addGlobal('user', $_SESSION['user'] ?? null);
@@ -52,21 +48,15 @@ $container->set('view', function () {
 AppFactory::setContainer($container);
 $app = AppFactory::create();
 
-$app->add('csrf');
-
-// Pass CSRF token to Twig
-$app->add(function ($request, $handler) use ($container) {
-    $csrf = $container->get('csrf');
-    $container->get('view')->getEnvironment()->addGlobal('csrf_token', $csrf->getTokenNameKey());
-    $container->get('view')->getEnvironment()->addGlobal('csrf_value', $csrf->getTokenValueKey());
-    return $handler->handle($request);
-});
+// Load settings, routes, middleware, etc.
+(require __DIR__ . '/../src/Settings.php')($container);
 
 // Register Twig Middleware
 $app->add(TwigMiddleware::createFromContainer($app));
 
-// Load settings, routes, middleware, etc.
-(require __DIR__ . '/../src/Settings.php')($container);
+// Register CSRF Middleware from container
+$app->add(CsrfMiddleware::class);
+
 (require __DIR__ . '/../src/web/Routes.php')($app);
 
 $app->run();

@@ -38,6 +38,11 @@
     </header>
     
     <main>
+        {% for type, messages in flash %}
+            {% for message in messages %}
+                <div class="alert alert-{{ type }}">{{ message }}</div>
+            {% endfor %}
+        {% endfor %}
         {% block content %}{% endblock %}
     </main>
     

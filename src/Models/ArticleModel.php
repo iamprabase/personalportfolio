@@ -9,6 +9,12 @@ class ArticleModel extends BaseModel {
     }
 
     public function createArticle(string $title, string $content, string $slug): bool {
+        $article_with_slug_exists = $this->getArticleBySlugCount($slug);
+        
+        if($article_with_slug_exists) {
+          $slug = $slug . '-' . $this->getArticleBySlugCount($slug)['cnt'] + 1;
+        }
+
         $sql = "INSERT INTO articles (title, content, slug) VALUES (?, ?, ?)";
         return $this->execute($sql, [$title, $content, $slug]);
     }
@@ -17,6 +23,12 @@ class ArticleModel extends BaseModel {
         $stmt = $this->pdo->prepare("SELECT * FROM articles WHERE slug = ?");
         $stmt->execute([$slug]);
         return $stmt->fetch() ?: null;
+    }
+
+    public function getArticleBySlugCount(string $slug): ?array {
+        $stmt = $this->pdo->prepare("SELECT Count(*) as cnt FROM articles WHERE slug = ?");
+        $stmt->execute([$slug]);
+        return $stmt->fetch();
     }
 
      public function getArticleById($id): ?array {

@@ -3,8 +3,10 @@
   "description": "A minimalist cms for for an author's website, featuring articles about her novel and allowing registered members to comment on articles.",
   "type": "project",
   "require": {
+    "cocur/slugify": "^4.6",
     "php-di/php-di": "^7.0",
     "slim/csrf": "^1.5",
+    "slim/flash": "^0.4.0",
     "slim/psr7": "^1.7",
     "slim/slim": "^4.0",
     "slim/twig-view": "^3.4",
