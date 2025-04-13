@@ -16,7 +16,11 @@
     </div>
 {% endif %}
 <h2>Register</h2>
-<form action="/register" method="post">
+<form action="{{base_url() ~ '/register'}}" method="post"  enctype="multipart/form-data">
+
+    <input type="hidden" name="{{ csrf.token_name_key }}" value="{{ csrf.token_name }}">
+    <input type="hidden" name="{{ csrf.token_value_key }}" value="{{ csrf.token_value }}">
+    
     <label for="username">Username:</label>
     <input type="text" name="username" id="username" required>
     
@@ -28,6 +32,9 @@
     
     <label for="password_confirm">Confirm Password:</label>
     <input type="password" name="password_confirm" id="password_confirm" required>
+    
+    <label for="photo">Profile Picture:</label>
+    <input type="file" name="photo" id="photo" accept="image/*">
     
     <button type="submit">Register</button>
 </form>

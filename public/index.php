@@ -64,9 +64,6 @@ $app->add('csrf');
 // Register Twig Middleware
 $app->add(TwigMiddleware::createFromContainer($app));
 
-// Register CSRF Middleware from container
-// $app->add(CsrfMiddleware::class);
-
 (require __DIR__ . '/../src/web/Routes.php')($app);
 
 $app->run();

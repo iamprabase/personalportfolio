@@ -78,18 +78,35 @@ class AuthController extends BaseController {
     }
     
     public function showRegister(ServerRequestInterface $request, ResponseInterface $response): ResponseInterface {
+        // CSRF token name and value
+        $nameKey = $this->csrf->getTokenNameKey();
+        $valueKey = $this->csrf->getTokenValueKey();
+        $name = $request->getAttribute($nameKey);
+        $value = $request->getAttribute($valueKey);
+        // Pass the CSRF token to the view
+        $this->view->getEnvironment()->addGlobal('csrf', [
+            'token_name_key' => $nameKey,
+            'token_value_key' => $valueKey,
+            'token_name'     => $name,
+            'token_value'    => $value,
+        ]);
         return $this->view->render($response, 'register.twig');
     }
     
     public function register(ServerRequestInterface $request, ResponseInterface $response): ResponseInterface {
         $data = $request->getParsedBody();
+        $uploadedFiles = $request->getUploadedFiles();
+
+        // Add the uploaded file to the data array for validation
+        $data['photo'] = $uploadedFiles['photo'] ?? null;
 
         // Define validation rules
         $rules = [
             'username'         => 'required|alpha_num|min:3|max:20',
             'email'            => 'required|email',
             'password'         => 'required|min:8',
-            'password_confirm' => 'required'
+            'password_confirm' => 'required|same:password',
+            'photo'            => 'file|mimes:jpeg,jpg,png|max:2048' // Custom file validation rule
         ];
 
         // Validate input
@@ -97,34 +114,39 @@ class AuthController extends BaseController {
         if (!$validator->validate($data, $rules)) {
             $errors = $validator->getErrors();
             return $this->view->render($response, 'register.twig', [
-              'errors' => $errors,
-              'data'   => $data // Pass back the input data to pre-fill the form
+                'errors' => $errors,
+                'data'   => $data // Pass back the input data to pre-fill the form
             ]);
         }
 
-        // Check if passwords match
-        if ($data['password'] !== $data['password_confirm']) {
-            return $this->view->render($response, 'register.twig', [
-              'errors' => ['password_confirm' => ['Passwords do not match.']],
-              'data'   => $data // Pass back the input data to pre-fill the form
-            ]);
+        // Handle profile picture upload
+        $profilePicture = $data['photo'];
+        $profilePicturePath = null;
+        if ($profilePicture && $profilePicture->getError() === UPLOAD_ERR_OK) {
+            $uploadDir = __DIR__ . '/../../public/uploads/profile_pictures/';
+            if (!is_dir($uploadDir)) {
+                mkdir($uploadDir, 0777, true);
+            }
+            $filename = uniqid() . '-' . $profilePicture->getClientFilename();
+            $profilePicture->moveTo($uploadDir . $filename);
+            $profilePicturePath = '/uploads/profile_pictures/' . $filename;
         }
 
         // Check if user already exists
         if ($this->userModel->getUserByUsername($data['username'])) {
             return $this->view->render($response, 'register.twig', [
-              'errors' => ['username' => ['Username already taken.']],
-              'data'   => $data // Pass back the input data to pre-fill the form
+                'errors' => ['username' => ['Username already taken.']],
+                'data'   => $data // Pass back the input data to pre-fill the form
             ]);
         }
 
         // Hash the password and register user
         $hashedPassword = password_hash($data['password'], PASSWORD_DEFAULT);
-        $userId = $this->userModel->registerUser($data['username'], $data['email'], $hashedPassword);
+        $userId = $this->userModel->registerUser($data['username'], $data['email'], $hashedPassword, $profilePicturePath);
         if (!$userId) {
             return $this->view->render($response, 'register.twig', [
-              'errors' => ['general' => ['Registration failed. Please try again.']],
-              'data'   => $data // Pass back the input data to pre-fill the form
+                'errors' => ['general' => ['Registration failed. Please try again.']],
+                'data'   => $data // Pass back the input data to pre-fill the form
             ]);
         }
 
@@ -132,7 +154,8 @@ class AuthController extends BaseController {
         $_SESSION['user'] = [
             'id'       => $userId,
             'username' => $data['username'],
-            'email'    => $data['email']
+            'email'    => $data['email'],
+            'photo'    => $profilePicturePath
         ];
 
         // Redirect to home or profile

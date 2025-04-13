@@ -9,9 +9,9 @@ class UserModel extends BaseModel {
         return $stmt->fetch() ?: null;
     }
 
-    public function registerUser(string $username, string $email, string $hashedPassword): ?int {
-        $stmt = $this->pdo->prepare("INSERT INTO users (username, email, password) VALUES (?, ?, ?)");
-        if ($stmt->execute([$username, $email, $hashedPassword])) {
+    public function registerUser(string $username, string $email, string $hashedPassword, $profilePicture = null): ?int {
+        $stmt = $this->pdo->prepare("INSERT INTO users (username, email, password, photo) VALUES (?, ?, ?, ?)");
+        if ($stmt->execute([$username, $email, $hashedPassword, $profilePicture])) {
             return (int)$this->pdo->lastInsertId();
         }
         return null;
