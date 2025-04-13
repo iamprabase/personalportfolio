@@ -5,16 +5,32 @@ use App\Utils\Validator;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use App\Models\UserModel;
+use Slim\Csrf\Guard;
 
 class AuthController extends BaseController {
     protected $userModel;
 
     
-    public function __construct() {
+    public function __construct(Guard $csrf) {
+        parent::__construct($csrf);
+
         $this->userModel = new UserModel();
     }
 
     public function showLogin(ServerRequestInterface $request, ResponseInterface $response): ResponseInterface {
+
+        // CSRF token name and value
+        $nameKey = $this->csrf->getTokenNameKey();
+        $valueKey = $this->csrf->getTokenValueKey();
+        $name = $request->getAttribute($nameKey);
+        $value = $request->getAttribute($valueKey);
+        // Pass the CSRF token to the view
+        $this->view->getEnvironment()->addGlobal('csrf', [
+            'token_name_key' => $nameKey,
+            'token_value_key' => $valueKey,
+            'token_name'     => $name,
+            'token_value'    => $value,
+        ]);
         return $this->view->render($response, 'login.twig');
     }
     

@@ -6,7 +6,8 @@ use Slim\Views\Twig;
 use Slim\Views\TwigMiddleware;
 use Dotenv\Dotenv;
 use DI\Container;
-use App\Middleware\CsrfMiddleware;
+use Slim\Csrf\Guard;
+// use App\Middleware\CsrfMiddleware;
 
 require __DIR__ . '/../vendor/autoload.php';
 
@@ -47,6 +48,15 @@ $container->set('view', function () {
 
 AppFactory::setContainer($container);
 $app = AppFactory::create();
+$responseFactory = $app->getResponseFactory();
+
+// Register Middleware On Container
+$container->set('csrf', function () use ($responseFactory) {
+    return new Guard($responseFactory);
+});
+
+// Register Middleware To Be Executed On All Routes
+$app->add('csrf');
 
 // Load settings, routes, middleware, etc.
 (require __DIR__ . '/../src/Settings.php')($container);
@@ -55,7 +65,7 @@ $app = AppFactory::create();
 $app->add(TwigMiddleware::createFromContainer($app));
 
 // Register CSRF Middleware from container
-$app->add(CsrfMiddleware::class);
+// $app->add(CsrfMiddleware::class);
 
 (require __DIR__ . '/../src/web/Routes.php')($app);
 

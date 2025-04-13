@@ -6,6 +6,7 @@ use Psr\Http\Message\ServerRequestInterface;
 use App\Models\ArticleModel;
 use App\Models\CommentModel;
 use App\Models\LanguageModel;
+use Slim\Csrf\Guard;
 
 class ArticleController extends BaseController {
     protected $articleModel;
@@ -14,7 +15,9 @@ class ArticleController extends BaseController {
 
     private static $config = null; // Holds the configuration
 
-    public function __construct() {
+    public function __construct(Guard $csrf) {
+        parent::__construct($csrf);
+        
         $this->articleModel  = new ArticleModel();
         $this->commentModel  = new CommentModel();
         $this->languageModel = new LanguageModel();

@@ -21,8 +21,8 @@
 
 <form action="{{ article.id is defined ? (base_url() ~ '/admin/article/edit/' ~ article.id) : (base_url() ~ '/admin/article/create') }}" method="post">
 
-    <input type="hidden" name="{{ csrf.nameKey }}" value="{{ csrf.name }}">
-    <input type="hidden" name="{{ csrf.valueKey }}" value="{{ csrf.value }}">
+    <input type="hidden" name="{{ csrf.token_name_key }}" value="{{ csrf.token_name }}">
+    <input type="hidden" name="{{ csrf.token_value_key }}" value="{{ csrf.token_value }}">
 
     <label>Title:</label>
     <input type="text" name="title" id="title" value="{{ article.title | default('') }}" required>

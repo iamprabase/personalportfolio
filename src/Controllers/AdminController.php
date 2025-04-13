@@ -8,13 +8,16 @@ use App\Models\ArticleModel;
 use App\Models\PageModel;       // A new model for pages (see note below)
 use App\Models\CommentModel;
 use Cocur\Slugify\Slugify;
+use Slim\Csrf\Guard;
 
 class AdminController extends BaseController {
     protected $articleModel;
     protected $pageModel;
     protected $commentModel;
 
-    public function __construct() {
+    public function __construct(Guard $csrf) {
+        parent::__construct($csrf);
+
         $this->articleModel = new ArticleModel();
         $this->pageModel    = new PageModel();
         $this->commentModel = new CommentModel();
