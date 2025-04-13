@@ -8,15 +8,15 @@ class ArticleModel extends BaseModel {
         return $stmt->fetchAll();
     }
 
-    public function createArticle(string $title, string $content, string $slug): bool {
+    public function createArticle(string $title, string $content, string $slug, string $featuredImage = null): bool {
         $article_with_slug_exists = $this->getArticleBySlugCount($slug);
         
         if($article_with_slug_exists) {
           $slug = $slug . '-' . $this->getArticleBySlugCount($slug)['cnt'] + 1;
         }
 
-        $sql = "INSERT INTO articles (title, content, slug) VALUES (?, ?, ?)";
-        return $this->execute($sql, [$title, $content, $slug]);
+        $sql = "INSERT INTO articles (title, content, slug, featured_image) VALUES (?, ?, ?, ?)";
+        return $this->execute($sql, [$title, $content, $slug, $featuredImage]);
     }
 
     public function getArticleBySlug(string $slug): ?array {
@@ -37,9 +37,9 @@ class ArticleModel extends BaseModel {
         return $stmt->fetch() ?: null;
     }
 
-    public function updateArticle(int $id, string $title, string $content, string $slug): bool {
-        $sql = "UPDATE articles SET title = ?, content = ?, slug = ? WHERE id = ?";
-        return $this->execute($sql, [$title, $content, $slug, $id]);
+    public function updateArticle(int $id, string $title, string $content, string $slug, string $featuredImage = null): bool {
+        $sql = "UPDATE articles SET title = ?, content = ?, slug = ?, featured_image = ? WHERE id = ?";
+        return $this->execute($sql, [$title, $content, $slug, $featuredImage, $id]);
     }
 
     public function deleteArticle(int $id): bool {

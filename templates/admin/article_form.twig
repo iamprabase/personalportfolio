@@ -29,6 +29,9 @@
     
     <label>Content:</label>
     <textarea name="content" id="content-editor">{{ article.content | default('') }}</textarea>
+
+    <label for="featured_image">Featured Image:</label>
+    <input type="file" name="featured_image" id="featured_image" accept="image/*">
     
     <button type="submit">{{ article ? 'Update' : 'Create' }} Article</button>
 </form>

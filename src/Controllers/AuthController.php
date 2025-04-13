@@ -98,7 +98,7 @@ class AuthController extends BaseController {
         $uploadedFiles = $request->getUploadedFiles();
 
         // Add the uploaded file to the data array for validation
-        $data['photo'] = $uploadedFiles['photo'] ?? null;
+        $data['profile_picture'] = $uploadedFiles['profile_picture'] ?? null;
 
         // Define validation rules
         $rules = [
@@ -106,8 +106,12 @@ class AuthController extends BaseController {
             'email'            => 'required|email',
             'password'         => 'required|min:8',
             'password_confirm' => 'required|same:password',
-            'photo'            => 'file|mimes:jpeg,jpg,png|max:2048' // Custom file validation rule
         ];
+
+        // Add profile picture validation rules only if a file is uploaded
+        if ($data['profile_picture'] && $data['profile_picture']->getError() === UPLOAD_ERR_OK) {
+            $rules['profile_picture'] = 'file|mimes:jpeg,jpg,png|max:2048';
+        }
 
         // Validate input
         $validator = new Validator();
@@ -120,7 +124,7 @@ class AuthController extends BaseController {
         }
 
         // Handle profile picture upload
-        $profilePicture = $data['photo'];
+        $profilePicture = $data['profile_picture'];
         $profilePicturePath = null;
         if ($profilePicture && $profilePicture->getError() === UPLOAD_ERR_OK) {
             $uploadDir = __DIR__ . '/../../public/uploads/profile_pictures/';
@@ -155,7 +159,7 @@ class AuthController extends BaseController {
             'id'       => $userId,
             'username' => $data['username'],
             'email'    => $data['email'],
-            'photo'    => $profilePicturePath
+            'profile_picture'    => $profilePicturePath
         ];
 
         // Redirect to home or profile
