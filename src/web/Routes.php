@@ -21,16 +21,16 @@ return function (App $app) {
     $app->post('/login', [AuthController::class, 'login']);
     $app->get('/register', [AuthController::class, 'showRegister']);
     $app->post('/register', [AuthController::class, 'register']);
-    $app->get('/logout', [AuthController::class, 'logout']);
-
 
     $app->get('/pages', PageController::class . ':index');  // List all pages
     $app->get('/page/{slug}', PageController::class . ':show');  // Show a page by slug
 
-
     // Comment: Article Comments
     // Admin Routes (protected by AuthMiddleware)
     $app->group('', function ($group) {
+      $group->get('/logout', [AuthController::class, 'logout']);
+      $group->get('/update-profile', [AuthController::class, 'editProfile']);
+      $group->post('/update-profile/{id}', [AuthController::class, 'updateProfile']);
       $group->post('/comments/{article_id}/store', [CommentController::class, 'store']); // Ensure this is defined only once
       $group->post('/comments/{id}/update', [CommentController::class, 'update']);
       $group->post('/comments/{id}/delete', [CommentController::class, 'delete']);

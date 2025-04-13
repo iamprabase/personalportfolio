@@ -17,11 +17,17 @@
     <header>
         <h1><a href="/">Minimalist CMS</a></h1>
         <nav>
-            <a href="/">Home</a> 
-             {% if not user %}
+            {% if not user['is_admin'] %}
+              <a href="/">Home</a> 
+            {% else %}
+              <a href="/admin">Home</a>
+            {%endif%}
+
+            {% if not user %}
             | <a href="/login">Login</a> |
             <a href="/register">Register</a>
             {% else %}
+            | <a href="/update-profile">Update Profile</a>
             | <a href="/logout">Logout</a>
             {% endif %}
         </nav>

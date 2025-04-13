@@ -16,4 +16,19 @@ class UserModel extends BaseModel {
         }
         return null;
     }
+
+    public function updateProfile(int $id, string $profilePicture, string $hashedPassword = null): ?int {
+        $params = [$profilePicture];
+        $sql = "UPDATE users SET profile_picture = ? "; 
+        
+        if(!empty($hashedPassword)) {
+          $sql .= ", password = ? ";
+          $params[] = $hashedPassword;
+        }
+        
+        $sql .= "WHERE id = ?";
+        $params[] = $id;
+
+        return $this->execute($sql, $params);
+    }
 }

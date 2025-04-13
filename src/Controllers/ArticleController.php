@@ -34,6 +34,9 @@ class ArticleController extends BaseController {
 
     // Home page: list all articles
     public function index(ServerRequestInterface $request, ResponseInterface $response): ResponseInterface {
+        if(isset($_SESSION['user']) && $_SESSION['user']['is_admin']) {
+          return $response->withHeader('Location', '/admin')->withStatus(302);
+        }
         $articles = $this->articleModel->getAllArticles();
         // Load available languages for the UI (for example, from the languages table)
         $languages = $this->languageModel->getAllLanguages();
