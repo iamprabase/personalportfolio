@@ -67,4 +67,6 @@ return function ($container) {
     \App\Config\Database::setConfig($settings['db']);
     // Pass the configuration array to your Controller class.
     \App\Controllers\ArticleController::setConfig($settings['author_meta_info']);
+    // Pass the configuration array to your Controller class.
+    \App\Controllers\AdminController::setConfig($settings['author_meta_info']);
 };
