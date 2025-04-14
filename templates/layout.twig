@@ -120,34 +120,36 @@
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
           <ul class="navbar-nav mr-auto">
             <li class="nav-item active">
-              <a class="nav-link" href="index.html">Home <span class="sr-only">(current)</span></a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="blog.html">Blog</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="single.html">Single</a>
+              <a class="nav-link" href="/">{{ trans('home') }} <span class="sr-only">(current)</span></a>
             </li>
             <li class="nav-item dropdown">
               <a class="nav-link dropdown-toggle" href="#" id="dropdownMenuButton2" data-toggle="dropdown"
-                aria-haspopup="true" aria-expanded="false">World</a>
+                aria-haspopup="true" aria-expanded="false">{{trans('jessica_jacobson')}}</a>
               <div class="dropdown-menu" aria-labelledby="dropdownMenuLink_1">
-                <a class="dropdown-item" href="#">Action in</a>
-                <a class="dropdown-item" href="#">Another action</a>
-                <a class="dropdown-item" href="#">Something else here</a>
+                <a class="dropdown-item" href="#">{{ trans('who_am_i') }}</a>
+                <a class="dropdown-item" href="#">{{ trans('my_journey') }}</a>
+                <a class="dropdown-item" href="#">{{ trans('my_hobbies') }}</a>
+                <a class="dropdown-item" href="#">{{ trans('my_favorite_books') }}</a>
+                <a class="dropdown-item" href="#">{{ trans('contact_me') }}</a>
               </div>
             </li>
             <li class="nav-item dropdown">
-              <a class="nav-link dropdown-toggle" href="#" id="dropdownMenuButton3" data-toggle="dropdown"
-                aria-haspopup="true" aria-expanded="false">Community</a>
+              <a class="nav-link dropdown-toggle" href="#" id="dropdownMenuButton2" data-toggle="dropdown"
+                aria-haspopup="true" aria-expanded="false">{{trans('heart_at_altitude')}}</a>
               <div class="dropdown-menu" aria-labelledby="dropdownMenuLink_1">
-                <a class="dropdown-item" href="#">Action in</a>
-                <a class="dropdown-item" href="#">Another action</a>
-                <a class="dropdown-item" href="#">Something else here</a>
+                <a class="dropdown-item" href="#">{{ trans('volume_1') }}</a>
+                <a class="dropdown-item" href="#">{{ trans('volume_2') }}</a>
+                <a class="dropdown-item" href="#">{{ trans('volume_3') }}</a>
               </div>
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="Contact_us.html">Contact</a>
+              <a class="nav-link" href="Contact_us.html">{{trans('publications')}}</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="Contact_us.html">{{trans('writing_workshop')}}</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="Contact_us.html">{{trans('media')}}</a>
             </li>
           </ul>
         </div>
@@ -163,9 +165,16 @@
         <div class="fh5co_suceefh5co_height"><img src="/assets/default_images/banner.jpg" alt="img" />
           <div class="fh5co_suceefh5co_height_position_absolute"></div>
           <div class="fh5co_suceefh5co_height_position_absolute_font">
-            {# <div class=""><a href="#" class="color_fff"> <i class="fa fa-clock-o"></i>&nbsp;&nbsp;Dec 31,2017 #}
-              {# </a></div> #}
-            <div class=""><a href="#" class="fh5co_good_font"> Jessica Jacobson: passionnée de psychologie sociale et d'écriture</a></div>
+            {% block article_banner_date %}
+            
+            {% endblock %}
+            <div class="">
+              <a href="#" class="fh5co_good_font"> 
+                {% block banner_title %}
+                  Jessica Jacobson: passionnée de psychologie sociale et d'écriture
+                {% endblock %}
+              </a>
+            </div>
           </div>
         </div>
       </div>

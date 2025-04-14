@@ -30,17 +30,15 @@
               </div>
               <div class="col-md-7 animate-box">
                 <div>
-                  <a href="/articles/{{article.slug}}" class="fh5co_magna py-2"> {{ article.title }} </a> 
+                  <a href="/article/{{article.slug}}" class="fh5co_magna py-2"> {{ article.title }} </a> 
                 </div>
                 <div>
-                  
-                  <a
-                      href="/articles/{{article.slug}}" class="fh5co_mini_time py-3"> {{ article.publisher }} - <i class="fa fa-clock-o"></i> {{
+                  <a href="/article/{{article.slug}}" class="fh5co_mini_time py-3"> {{ article.publisher }} - <i class="fa fa-clock-o"></i> {{
                       article.publication_date|date("F j, Y") }}</a>
                 </div>
-                <div class="fh5co_consectetur"> {{ article.content | raw  }}
+                <div class="fh5co_consectetur"> {{ article.content | striptags | slice(0, 150) ~ '...' }}
                 </div>
-                <a href="/articles/{{article.slug}}" class="read-more">Read More</a>
+                <a href="/article/{{article.slug}}" class="read-more">Read More</a>
               </div>
             </div>
             {% endfor %}
@@ -89,7 +87,7 @@
               </div>
               <div class="col-7 paddding">
                 <div class="most_fh5co_treding_font"> 
-                  <a href="/articles/{{article.slug}}"> 
+                  <a href="/article/{{article.slug}}"> 
                     {{ article.title }}
                   </a>
                 </div>
@@ -110,7 +108,7 @@
                 <img src="/assets/{{article.featured_image ? article.featured_image : '/default_images/default_image.png' }}" alt="{{ article.title }}" class="fh5co_most_trading"  />
               </div>
               <div class="col-7 paddding">
-                <div class="most_fh5co_treding_font"> <a href="/articles/{{article.slug}}"> 
+                <div class="most_fh5co_treding_font"> <a href="/article/{{article.slug}}"> 
                   {{ article.title }}
                 </a></div>
                 <div class="most_fh5co_treding_font_123"> {{ article.publisher }} - <i class="fa fa-clock-o"></i> {{ article.publication_date|date("F j, Y") }}</div>
@@ -123,5 +121,4 @@
     </div>
   </div>
 </div>
-
 {% endblock %}

@@ -43,10 +43,6 @@ class ArticleController extends BaseController {
 
         $totalPages = ceil($totalArticles / $perPage);
 
-        // echo "<pre>";
-        // var_dump($articles, $page, $totalPages); // Debugging output
-        // die;
-
         return $this->view->render($response, 'index.twig', [
             'articles' => $articles,
             'currentPage' => $page,
@@ -65,8 +61,8 @@ class ArticleController extends BaseController {
         }
         $comments = $this->commentModel->getCommentsByArticleId($article['id']);
 
-        $current_user_id = $_SESSION['user']['id'] ?? null;
-        $is_admin = $_SESSION['user']['is_admin'] ? true : false;
+        $current_user_id = isset($_SESSION['user']) ? $_SESSION['user']['id'] : null;
+        $is_admin = isset($_SESSION['user']) && isset($_SESSION['user']['is_admin']) ? $_SESSION['user']['is_admin'] : false;
 
         $this->addCsrfToView($request); // Use the method from BaseController
 
