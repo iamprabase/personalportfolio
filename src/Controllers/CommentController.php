@@ -38,47 +38,25 @@ class CommentController extends BaseController {
 
         $article = $this->articleModel->getArticleById($id);
         if (!$article) {
-          $payload = json_encode([
-            'ok' => false,
-            'error' => 'Related article not found!',
-          ]);
-
-          $response->getBody()->write($payload);
-
-          return $response
-              ->withHeader('Content-Type', 'application/json')
-              ->withStatus(403);
+            return $response
+                ->withHeader('Location', '/article/' . $article['slug'])
+                ->withStatus(302);
         }
 
         $validator = new Validator();
         if (!$validator->validate($data, $rules)) {
             $errors = $validator->getErrors();
-
-            $payload = json_encode([
-              'ok' => false,
-              'error' => implode('<br/>', $errors['comment_text']),
-            ]);
-
-            $response->getBody()->write($payload);
-
+            $_SESSION['comment_errors'] = implode('<br/>', $errors['comment_text']);
             return $response
-                ->withHeader('Content-Type', 'application/json')
-                ->withStatus(403);
+                ->withHeader('Location', '/article/' . $article['slug'])
+                ->withStatus(302);
         }
 
         $this->commentModel->createComment($id, $data['comment_text']);
-
-        $payload = json_encode([
-          'ok' => true,
-          'message' => 'Comment added successfully!',
-          'comment_text' => $data['comment_text']
-        ]);
-
-        $response->getBody()->write($payload);
-
+        $_SESSION['comment_success'] = 'Comment added successfully!';
         return $response
-            ->withHeader('Content-Type', 'application/json')
-            ->withStatus(200);
+            ->withHeader('Location', '/article/' . $article['slug'])
+            ->withStatus(302);
     }
 
     public function update(ServerRequestInterface $request, ResponseInterface $response, array $args): ResponseInterface {
