@@ -43,6 +43,10 @@ class ArticleController extends BaseController {
 
         $totalPages = ceil($totalArticles / $perPage);
 
+        // echo "<pre>";
+        // var_dump($articles, $page, $totalPages); // Debugging output
+        // die;
+
         return $this->view->render($response, 'index.twig', [
             'articles' => $articles,
             'currentPage' => $page,

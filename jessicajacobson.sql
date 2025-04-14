@@ -1,6 +1,7 @@
 -- Articles table
 CREATE TABLE articles (
     id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
     title VARCHAR(255) NOT NULL,
     content TEXT NOT NULL,
     publication_date DATETIME DEFAULT CURRENT_TIMESTAMP,
@@ -9,7 +10,8 @@ CREATE TABLE articles (
     meta_description TEXT,
     canonical_url VARCHAR(255),
     language VARCHAR(10) DEFAULT 'en',
-    featured_image VARCHAR(255)  -- URL or relative path to the featured_image
+    featured_image VARCHAR(255),  -- URL or relative path to the featured_image
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL
 );
 
 -- Pages table

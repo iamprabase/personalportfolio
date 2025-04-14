@@ -56,7 +56,7 @@ class ArticleModel extends BaseModel {
 
     public function getPaginatedArticles(int $page, int $perPage): array {
         $offset = ($page - 1) * $perPage;
-        $query = "SELECT * FROM articles ORDER BY publication_date DESC LIMIT :limit OFFSET :offset";
+        $query = "SELECT `users`.`username` as publisher, `articles`.* FROM articles LEFT JOIN users ON articles.user_id = users.id ORDER BY publication_date DESC LIMIT :limit OFFSET :offset";
         $stmt = $this->pdo->prepare($query); // Use $this->pdo for consistency
         $stmt->bindValue(':limit', $perPage, \PDO::PARAM_INT);
         $stmt->bindValue(':offset', $offset, \PDO::PARAM_INT);

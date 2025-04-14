@@ -1,6 +1,15 @@
 <?php
 return [
+    'home' => 'Home',
     'articles' => 'Articles',
+    'most_popular' => 'Most Popular',
+    'featured_posts' => 'Featured Posts',
+    'login' => 'Login',
+    'register' => 'Register',
+    'username' => 'Username',
+    'password' => 'Password',
+    'logout' => 'Logout',
+    
     'no_articles_found' => 'No articles found.',
     'comments' => 'Comments',
     'edit' => 'Edit',
