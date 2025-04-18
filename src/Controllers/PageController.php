@@ -2,17 +2,29 @@
 
 namespace App\Controllers;
 
-use App\Models\PageModel;
+use App\Utils\Validator;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
+use App\Models\PageModel;
+use Slim\Csrf\Guard;
 
 class PageController extends BaseController {
     private $pageModel;
+    private static $config = null; // Holds the configuration
 
-    public function __construct($view, PageModel $pageModel)
+    public function __construct(Guard $csrf)
     {
-        $this->view = $view;
-        $this->pageModel = $pageModel;
+        parent::__construct($csrf);
+        $this->pageModel = new PageModel();
+    }
+
+    /**
+     * Sets the configuration for the database connection.
+     *
+     * @param array $config The database configuration (host, dbname, user, pass, charset)
+     */
+    public static function setConfig(array $config): void {
+        self::$config = $config;
     }
 
     // Display all pages (just for testing purposes)

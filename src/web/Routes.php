@@ -17,7 +17,7 @@ return function (App $app) {
     $app->get('/article/{slug}', [ArticleController::class, 'view']);
 
     // In routes/web.php or wherever your routes are defined
-    $app->get('/change-language', function ($request, $response, $args) {
+    $app->get('/change-language', function ($request, $response) {
         $params = $request->getQueryParams();
         $lang = $params['lang'] ?? 'en';
 
@@ -31,6 +31,7 @@ return function (App $app) {
 
         // Redirect back (or to home if no referrer)
         $referer = $request->getServerParams()['HTTP_REFERER'] ?? '/';
+
         return $response
             ->withHeader('Location', $referer)
             ->withStatus(302);
@@ -43,8 +44,8 @@ return function (App $app) {
     $app->post('/register', [AuthController::class, 'register']);
 
     // Page Routes
-    $app->get('/pages', PageController::class . ':index');  // List all pages
-    $app->get('/page/{slug}', PageController::class . ':show');  // Show a page by slug
+    $app->get('/pages', [PageController::class, 'index']);  // List all pages
+    $app->get('/page/{slug}', [PageController::class, 'show']);  // Show a page by slug
 
     // Comment: Article Comments
     // Admin Routes (protected by AuthMiddleware)
@@ -52,7 +53,7 @@ return function (App $app) {
       $group->get('/logout', [AuthController::class, 'logout']);
       $group->get('/update-profile', [AuthController::class, 'editProfile']);
       $group->post('/update-profile/{id}', [AuthController::class, 'updateProfile']);
-      $group->post('/comments/{article_id}/store', [CommentController::class, 'store']); // Ensure this is defined only once
+      $group->post('/comments/{article_id}/store', [CommentController::class, 'store']);
       $group->post('/comments/{id}/update', [CommentController::class, 'update']);
       $group->post('/comments/{id}/delete', [CommentController::class, 'delete']);
     })->add(new AuthMiddleware());
@@ -60,6 +61,8 @@ return function (App $app) {
     // Admin Routes (protected by AdminMiddleware)
     $app->group('/admin', function ($group) {
         $group->get('', [AdminController::class, 'dashboard']);
+        $group->get('/articles', [AdminController::class, 'listArticles']);
+        $group->get('/comments', [AdminController::class, 'listComments']);
         $group->get('/article/create', [AdminController::class, 'create']);
         $group->post('/article/create', [AdminController::class, 'store']);
         $group->get('/article/edit/{id}', [AdminController::class, 'edit']);

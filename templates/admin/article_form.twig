@@ -1,60 +1,94 @@
-{% extends 'layout.twig' %}
+    {% extends 'admin/layout.twig' %}
 
-{% block title %}{{ article ? 'Edit' : 'New' }} Article{% endblock %}
+    {% block title %}{{ article ? 'Edit' : 'New' }} Article {% endblock %}
 
+    {% block content %}
+        <!-- Main content wrapper -->
+        <div class="wrapper">
 
-{% block content %}
+            <!-- Note -->
+{#            <div class="nNote nInformation hideit">#}
+{#                <p><strong>INFORMATION: </strong>Form elements were divided into 4 different pages. Don't forget to check all of them!</p>#}
+{#            </div>#}
 
-{% if errors %}
-  <div class="errors">
-      <ul>
-          {% for field, messages in errors %}
-              {% for message in messages %}
-                  <li>{{ field|capitalize }}: {{ message }}</li>
-              {% endfor %}
-          {% endfor %}
-      </ul>
-  </div>
-{% endif %}
+            <!-- Form -->
+            <form class="form" action="{{ article.id is defined ? ('/admin/article/edit/' ~ article.id) : ('/admin/article/create') }}" method="post" enctype="multipart/form-data">
 
-<h2>{{ article ? 'Edit' : 'Create' }} Article</h2>
+                <input type="hidden" name="{{ csrf.token_name_key }}" value="{{ csrf.token_name }}">
+                <input type="hidden" name="{{ csrf.token_value_key }}" value="{{ csrf.token_value }}">
 
-<form action="{{ article.id is defined ? (base_url() ~ '/admin/article/edit/' ~ article.id) : (base_url() ~ '/admin/article/create') }}" method="post" enctype="multipart/form-data">
+                <fieldset>
+                    <div class="widget">
+                        <div class="title">
+                            <img src="/assets/backend/default_images/icons/dark/list.png" alt="" class="titleIcon"><h6>{{ article ? 'Edit' : 'New' }} Article </h6>
+                        </div>
+                        <div class="formRow">
+                            <label>{{trans('post_title')}}</label>
+                            <div class="formRight">
+                                <input type="text" name="title" id="title" value="{{ article.title | default('') }}" required>
+                            </div>
+                        </div>
+                        <div class="formRow">
+                            <label for="labelFor">{{trans('post_description')}}</label>
+                            <div class="formRight">
+                                <textarea name="content" id="content-editor">{{ article.content | default('') }}</textarea>
+                            </div>
+                        </div>
+                        <div class="formRow">
+                            <label>{{trans('post_featured_image')}}</label>
+                            <div class="formRight">
+                                <input type="file" name="featured_image" id="featured_image" accept="image/*">
+                            </div>
+                        </div>
 
-    <input type="hidden" name="{{ csrf.token_name_key }}" value="{{ csrf.token_name }}">
-    <input type="hidden" name="{{ csrf.token_value_key }}" value="{{ csrf.token_value }}">
+                        {% if article %}
+                            <div class="formRow">
+                                <label>{{ trans('current_image') }}</label>
+                                <div class="formRight">
+                                    {% set profilePic = article.featured_image ? article.featured_image : '/assets/frontend/default_images/banner.jpg' %}
+                                    <img src="{{ profilePic }}" alt="" style="width: 250px; height: 150px;">
+                                </div>
+                            </div>
+                        {% endif %}
+                        <div class="formRow">
+                            <label>{{trans('post_display_position')}}</label>
+                            <div class="formRight">
+                                <select class="form-control fh5co_text_select_option" name="post_type" onchange="this.form.submit()">
+                                    <option value="my_recent_publications" {% if 'my_recent_publications' is same as article.type %} selected {% endif %}>{{ trans('my_recent_publications') }}</option>
+                                    <option value="home_page" {% if 'home_page' is same as article.post_type %} selected {% endif %}>{{ trans('home_page') }}</option>
+                                    <option value="member_publications" {% if 'member_publications' is same as article.post_type %} selected {% endif %}>{{ trans('member_publications') }}</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="formRow">
+                        <button type="submit">{{ article ? 'Update' : 'Create' }} Article</button>
+                        </div>
 
-    <label>Title:</label>
-    <input type="text" name="title" id="title" value="{{ article.title | default('') }}" required>
-    
-    <label>Content:</label>
-    <textarea name="content" id="content-editor">{{ article.content | default('') }}</textarea>
+                    </div>
+                </fieldset>
+            </form>
 
-    <label for="featured_image">Featured Image:</label>
-    <input type="file" name="featured_image" id="featured_image" accept="image/*">
-    
-    <button type="submit">{{ article ? 'Update' : 'Create' }} Article</button>
-</form>
+        </div>
 
-<!-- TinyMCE Integration -->
-<script src="{{ base_url() }}/assets/js/tinymce/tinymce.min.js"></script>
+    <!-- TinyMCE Integration -->
+    <script src="/assets/frontend/js/tinymce/tinymce.min.js"></script>
 
-<script type="text/javascript">
-  // Ensure TinyMCE is initialized when the page loads
-  window.onload = function() {
-      tinymce.init({
-          selector: '#content-editor', // The textarea you want to turn into TinyMCE
-          plugins: 'advlist autolink lists link image charmap print preview',
-          toolbar: 'undo redo | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist | link image',
-          menubar: false,
-          setup: function(editor) {
-              // Set the content from the backend (Twig variable)
-              editor.on('init', function() {
-                  editor.setContent(`{{ article.content | default('') | escape('js') }}`);
-              });
-          }
-      });
-  };
-</script>
+    <script type="text/javascript">
+      // Ensure TinyMCE is initialized when the page loads
+      window.onload = function() {
+          tinymce.init({
+              selector: '#content-editor', // The textarea you want to turn into TinyMCE
+              plugins: 'advlist autolink lists link image charmap print preview',
+              toolbar: 'undo redo | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist | link image',
+              menubar: false,
+              setup: function(editor) {
+                  // Set the content from the backend (Twig variable)
+                  editor.on('init', function() {
+                      editor.setContent(`{{ article.content | default('') | escape('js') }}`);
+                  });
+              }
+          });
+      };
+    </script>
 
-{% endblock %}
+    {% endblock %}

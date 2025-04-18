@@ -86,6 +86,9 @@ class AuthController extends BaseController {
             'email'            => 'required|email',
             'password'         => 'required|min:8',
             'password_confirm' => 'required|same:password',
+            'full_name' => 'required|min:3|max:50',
+            'city'     => 'alpha_num|max:50',
+            'country'  => 'alpha_num|max:50',
         ];
 
         // Add profile picture validation rules only if a file is uploaded
@@ -129,7 +132,7 @@ class AuthController extends BaseController {
 
         // Hash the password and register user
         $hashedPassword = password_hash($data['password'], PASSWORD_DEFAULT);
-        $userId = $this->userModel->registerUser($data['username'], $data['email'], $hashedPassword, $profilePicturePath);
+        $userId = $this->userModel->registerUser($data['username'], $data['email'], $data['full_name'], $hashedPassword, $profilePicturePath, $data['city'], $data['country']);
         if (!$userId) {
             $this->addCsrfToView($request); 
             return $this->view->render($response, 'auth/register.twig', [

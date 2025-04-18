@@ -8,15 +8,17 @@ class ArticleModel extends BaseModel {
         return $stmt->fetchAll();
     }
 
-    public function createArticle(string $title, string $content, string $slug, string $featuredImage = null): bool {
+    public function createArticle(string $title, string $content, string $slug, string $featuredImage = null, string $post_type = null): bool {
         $article_with_slug_exists = $this->getArticleBySlugCount($slug);
-        
+
         if($article_with_slug_exists) {
           $slug = $slug . '-' . $this->getArticleBySlugCount($slug)['cnt'] + 1;
         }
 
-        $sql = "INSERT INTO articles (title, content, slug, featured_image) VALUES (?, ?, ?, ?)";
-        return $this->execute($sql, [$title, $content, $slug, $featuredImage]);
+        $user_id = $_SESSION['user']['id'];
+        $sql = "INSERT INTO articles (title, content, user_id, slug, featured_image, post_type) VALUES (?, ?, ?, ?, ?, ?)";
+
+        return $this->execute($sql, [$title, $content, $user_id, $slug, $featuredImage, $post_type]);
     }
 
     public function getArticleBySlug(string $slug): ?array {
@@ -44,9 +46,15 @@ class ArticleModel extends BaseModel {
         return $stmt->fetch() ?: null;
     }
 
-    public function updateArticle(int $id, string $title, string $content, string $slug, string $featuredImage = null): bool {
-        $sql = "UPDATE articles SET title = ?, content = ?, slug = ?, featured_image = ? WHERE id = ?";
-        return $this->execute($sql, [$title, $content, $slug, $featuredImage, $id]);
+    public function updateArticle(int $id, string $title, string $content, string $slug, string $featuredImage = null, string $post_type = null): bool {
+        $article_with_slug_exists = $this->getArticleBySlugCount($slug);
+
+        if($article_with_slug_exists) {
+          $slug = $slug . '-' . time();
+        }
+
+        $sql = "UPDATE articles SET title = ?, content = ?, slug = ?, featured_image = ?, post_type = ? WHERE id = ?";
+        return $this->execute($sql, [$title, $content, $slug, $featuredImage, $post_type, $id]);
     }
 
     public function deleteArticle(int $id): bool {

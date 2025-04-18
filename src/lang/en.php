@@ -22,6 +22,7 @@ return [
     'writing_workshop' => 'Writing Workshop',   
     'media' => 'Who Am I?',
     'comment_lists' => 'Comments',
+    'contact_us' => 'Contact Us',
     
     'no_articles_found' => 'No articles found.',
     'edit' => 'Edit',

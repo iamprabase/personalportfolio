@@ -9,22 +9,21 @@ class PageModel extends BaseModel {
     {
         $stmt = $this->pdo->prepare("SELECT * FROM pages ORDER BY created_at DESC");
         $stmt->execute();
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        return $stmt->fetchAll();
     }
 
     // Get a single page by its slug
     public function getPageBySlug(string $slug): ?array
     {
         $stmt = $this->pdo->prepare("SELECT * FROM pages WHERE slug = :slug LIMIT 1");
-        $stmt->bindParam(':slug', $slug, PDO::PARAM_STR);
-        $stmt->execute();
-        return $stmt->fetch(PDO::FETCH_ASSOC) ?: null;
+        $stmt->execute([$slug]);
+        return $stmt->fetch() ?: null;
     }
 
     public function getPageById(int $id): ?array {
-        $sql = "SELECT * FROM pages WHERE id = ?";
-        $result = $this->query($sql, [$id]);
-        return $result[0] ?? null;
+        $stmt = $this->pdo->prepare("SELECT * FROM pages WHERE id = ?");
+        $stmt->execute([$id]);
+        return $stmt->fetch() ?: null;
     }
 
     // Create a new page

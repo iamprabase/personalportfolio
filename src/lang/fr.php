@@ -25,5 +25,6 @@ return [
     'comment_lists' => 'Comments',
     'edit' => 'Edit',
     'delete' => 'Delete',
+    'contact_us' => 'Contact Us',
     
 ];

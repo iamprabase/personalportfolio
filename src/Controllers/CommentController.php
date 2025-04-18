@@ -80,7 +80,7 @@ class CommentController extends BaseController {
               ->withHeader('Content-Type', 'application/json')
               ->withStatus(403);
         }
-        
+
         if($comment['user_id'] != $_SESSION['user']['id'] && !$_SESSION['user']['is_admin']) {
           $payload = json_encode([
             'ok' => false,
@@ -111,7 +111,7 @@ class CommentController extends BaseController {
         }
 
         $this->commentModel->updateComment($id, $data['comment_text']);
-        
+
         $payload = json_encode([
           'ok' => true,
           'message' => 'Comment updated successfully!',
@@ -128,7 +128,7 @@ class CommentController extends BaseController {
 
     public function delete(ServerRequestInterface $request, ResponseInterface $response, array $args): ResponseInterface {
         $id = $args['id'];
-        
+
         $comment = $this->commentModel->getCommentById($id);
         if($comment['user_id'] != $_SESSION['user']['id'] && !$_SESSION['user']['is_admin']) {
           $payload = json_encode([
@@ -143,7 +143,7 @@ class CommentController extends BaseController {
               ->withStatus(403);
         }
         $this->commentModel->deleteComment($id);
-        
+
         $payload = json_encode([
           'ok' => true,
           'message' => 'Comment deleted successfully!',
@@ -151,8 +151,10 @@ class CommentController extends BaseController {
 
         $response->getBody()->write($payload);
 
-        return $response
-            ->withHeader('Content-Type', 'application/json')
-            ->withStatus(200);
+//        return $response
+//            ->withHeader('Content-Type', 'application/json')
+//            ->withStatus(200);
+        return $response->withHeader('Location', '/admin/comments')->withStatus(302);
+
     }
 }
