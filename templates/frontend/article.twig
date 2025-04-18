@@ -1,0 +1,191 @@
+{% extends 'frontend/layout.twig' %}
+
+{% block title %}{{ article.title }}{% endblock %}
+
+{% block banner_title %} {{ article.title }} {% endblock %}
+
+{% block article_banner_date %}
+<div class="">
+  <a href="#" class="color_fff"> <i class="fa fa-clock-o"></i>&nbsp;&nbsp;{{ article.publication_date|date("F j, Y") }}
+  </a>
+</div>
+{% endblock %}
+
+{% block content %}
+<div id="fh5co-single-content" class="container-fluid pb-4 pt-4 paddding">
+  <div class="container paddding">
+    <div class="row mx-0">
+      <div class="col-md-8 animate-box fadeInLeft animated-fast" data-animate-effect="fadeInLeft">
+        {{ article.content|raw }}
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+  <h2 class="tm-color-primary tm-post-title">{{ trans('comment_lists') }}</h2>
+  <hr class="tm-hr-primary tm-mb-45">
+  {% for comment in comments %}
+  <div class="tm-comment tm-mb-45 d-flex align-items-start"  data-comment-id="{{ comment.id }}">
+    <figure class="tm-comment-figure">
+      <img src="{{ comment.user_avatar|default('/assets/default_images/default-avatar.png') }}" alt="User Avatar" class="mb-2 rounded-circle img-thumbnail">
+    </figure>
+    <div class="tm-comment-content" >
+      <figcaption class="tm-color-primary font-weight-bold">{{ comment.username }}</figcaption>
+      <p class="tm-comment-text">{{ comment.comment_text }}</p>
+
+      <form action="/comments/{{ article.id }}/store" style="display: none;" method="POST" class="mb-5 tm-comment-form edit-comment-form">
+        <input type="hidden" name="{{ csrf.token_name_key }}" value="{{ csrf.token_name }}">
+        <input type="hidden" name="{{ csrf.token_value_key }}" value="{{ csrf.token_value }}">
+        <div class="mb-4">
+          <textarea class="form-control" name="comment_text" rows="6" placeholder="Your Comment" required> {{ comment.comment_text }} </textarea>
+        </div>
+        <div class="text-right">
+          <button type="button" class="tm-btn tm-btn-primary tm-btn-small save-comment-btn">Save</button>
+          <button type="button" class="tm-btn tm-btn-primary tm-btn-small cancel-edit-btn">Cancel</button>
+        </div>
+      </form>
+
+      <div class="d-flex justify-content-between align-items-center">
+        <span class="tm-color-primary small">{{ comment.comment_date|date("F j, Y") }}</span>
+        {# {% if comment.user_id == current_user_id or is_admin %} #}
+        {% if is_admin %}
+        <div class="comment-actions mt-2">
+          <a href="#" class="tm-color-primary small edit-comment-link">{{ trans('edit') }}</a>
+          <span class="mx-2">|</span>
+          <a href="#" class="tm-color-primary small delete-comment-link">{{ trans('delete') }}</a>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+  {% else %}
+  <p>No comments yet. Be the first to comment!</p>
+  {% endfor %}
+
+  {% if comment or is_admin or current_user_id > 0 %}
+    <form action="/comments/{{ article.id }}/store" method="POST" class="mb-5 tm-comment-form">
+      <h2 class="tm-color-primary tm-post-title mb-4">Leave a Comment</h2>
+      <input type="hidden" name="{{ csrf.token_name_key }}" value="{{ csrf.token_name }}">
+      <input type="hidden" name="{{ csrf.token_value_key }}" value="{{ csrf.token_value }}">
+      <div class="mb-4">
+        <textarea class="form-control" name="comment_text" rows="6" placeholder="Your Comment" required></textarea>
+      </div>
+      <div class="text-right">
+        <button class="tm-btn tm-btn-primary tm-btn-small">Submit</button>
+      </div>
+    </form>
+  {% endif %}
+
+</div>
+
+<script>
+{% if is_admin %}
+  document.addEventListener('DOMContentLoaded', () => {
+    let csrfNameKey = '{{ csrf.token_name_key }}';
+    let csrfValueKey = '{{ csrf.token_value_key }}';
+    let csrfName = '{{ csrf.token_name }}';
+    let csrfValue = '{{ csrf.token_value }}';
+
+    document.querySelectorAll('.edit-comment-link').forEach(button => {
+      button.addEventListener('click', (e) => {
+        e.preventDefault();
+        const commentDiv = e.target.closest('.tm-comment');
+        commentDiv.querySelector('.tm-comment-text').style.display = 'none';
+        commentDiv.querySelector('.edit-comment-link').style.display = 'none';
+        commentDiv.querySelector('.edit-comment-form').style.display = 'block';
+      });
+    });
+
+    document.querySelectorAll('.cancel-edit-btn').forEach(button => {
+      button.addEventListener('click', (e) => {
+        e.preventDefault();
+        const commentDiv = e.target.closest('.tm-comment');
+        commentDiv.querySelector('.tm-comment-text').style.display = 'block';
+        commentDiv.querySelector('.edit-comment-link').style.display = 'inline';
+        commentDiv.querySelector('.edit-comment-form').style.display = 'none';
+      });
+    });
+
+    document.querySelectorAll('.save-comment-btn').forEach(button => {
+      button.addEventListener('click', async (e) => {
+        e.preventDefault();
+        const commentDiv = e.target.closest('.tm-comment');
+        const commentId = commentDiv.dataset.commentId;
+        const commentText = commentDiv.querySelector('textarea[name="comment_text"]').value;
+
+        const createFormData = () => {
+          const formData = new FormData();
+          formData.append('comment_text', commentText);
+          formData.append(csrfNameKey, csrfName);
+          formData.append(csrfValueKey, csrfValue);
+          return formData;
+        };
+
+        const sendRequest = async (url, formData) => {
+          return await fetch(url, {
+            method: 'POST',
+            headers: {
+              'X-Requested-With': 'XMLHttpRequest'
+            },
+            body: formData
+          });
+        };
+
+        let response = await sendRequest(`/comments/${commentId}/update`, createFormData());
+
+        if (response.ok) {
+          const updatedComment = await response.json();
+          commentDiv.querySelector('.tm-comment-text').textContent = updatedComment.comment_text;
+          commentDiv.querySelector('.tm-comment-text').style.display = 'block';
+          commentDiv.querySelector('.edit-comment-link').style.display = 'inline';
+          commentDiv.querySelector('.edit-comment-form').style.display = 'none';
+        } else {
+          const responseData = await response.json();
+          alert(responseData.error || 'Failed to update the comment. Please try again.');
+        }
+      });
+    });
+
+    document.querySelectorAll('.delete-comment-link').forEach(button => {
+      button.addEventListener('click', async (e) => {
+        e.preventDefault();
+        const commentDiv = e.target.closest('.tm-comment');
+        const commentId = commentDiv.dataset.commentId;
+
+        if (!confirm('Are you sure you want to delete this comment?')) {
+          return;
+        }
+
+        const createFormData = () => {
+          const formData = new FormData();
+          formData.append(csrfNameKey, csrfName);
+          formData.append(csrfValueKey, csrfValue);
+          return formData;
+        };
+
+        const sendRequest = async (url, formData) => {
+          return await fetch(url, {
+            method: 'POST',
+            headers: {
+              'X-Requested-With': 'XMLHttpRequest'
+            },
+            body: formData
+          });
+        };
+
+        let response = await sendRequest(`/comments/${commentId}/delete`, createFormData());
+
+        if (response.ok) {
+          commentDiv.remove();
+        } else {
+          const responseData = await response.json();
+          alert(responseData.error || 'Failed to delete the comment. Please try again.');
+        }
+      });
+    });
+  });
+{% endif %}
+</script>
+
+{% endblock %}

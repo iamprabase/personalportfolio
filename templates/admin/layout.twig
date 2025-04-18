@@ -1,0 +1,219 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
+<title>{% block title %}{{ page.meta_title|default('Jessica Jacobson') }}{% endblock %}</title>
+<link href="/assets/backend/css/main.css" rel="stylesheet" type="text/css" />
+
+<script type="text/javascript" src="/assets/backend/js/jquery.min.js"></script>
+<script type="text/javascript" src="/assets/backend/js/jquery-ui.min.js"></script>
+
+<script type="text/javascript" src="/assets/backend/js/plugins/spinner/jquery.mousewheel.js"></script>
+
+<script type="text/javascript" src="/assets/backend/js/plugins/charts/excanvas.min.js"></script>
+<script type="text/javascript" src="/assets/backend/js/plugins/charts/jquery.flot.js"></script>
+<script type="text/javascript" src="/assets/backend/js/plugins/charts/jquery.flot.orderBars.js"></script>
+<script type="text/javascript" src="/assets/backend/js/plugins/charts/jquery.flot.pie.js"></script>
+<script type="text/javascript" src="/assets/backend/js/plugins/charts/jquery.flot.resize.js"></script>
+<script type="text/javascript" src="/assets/backend/js/plugins/charts/jquery.sparkline.min.js"></script>
+
+<script type="text/javascript" src="/assets/backend/js/plugins/forms/uniform.js"></script>
+<script type="text/javascript" src="/assets/backend/js/plugins/forms/jquery.cleditor.js"></script>
+<script type="text/javascript" src="/assets/backend/js/plugins/forms/jquery.validationEngine-en.js"></script>
+<script type="text/javascript" src="/assets/backend/js/plugins/forms/jquery.validationEngine.js"></script>
+<script type="text/javascript" src="/assets/backend/js/plugins/forms/jquery.tagsinput.min.js"></script>
+<script type="text/javascript" src="/assets/backend/js/plugins/forms/jquery.autosize.js"></script>
+<script type="text/javascript" src="/assets/backend/js/plugins/forms/jquery.maskedinput.min.js"></script>
+<script type="text/javascript" src="/assets/backend/js/plugins/forms/jquery.dualListBox.js"></script>
+<script type="text/javascript" src="/assets/backend/js/plugins/forms/jquery.inputlimiter.min.js"></script>
+<script type="text/javascript" src="/assets/backend/js/plugins/forms/chosen.jquery.min.js"></script>
+
+<script type="text/javascript" src="/assets/backend/js/plugins/wizard/jquery.form.js"></script>
+<script type="text/javascript" src="/assets/backend/js/plugins/wizard/jquery.validate.min.js"></script>
+<script type="text/javascript" src="/assets/backend/js/plugins/wizard/jquery.form.wizard.js"></script>
+
+<script type="text/javascript" src="/assets/backend/js/plugins/uploader/plupload.js"></script>
+<script type="text/javascript" src="/assets/backend/js/plugins/uploader/plupload.html5.js"></script>
+<script type="text/javascript" src="/assets/backend/js/plugins/uploader/plupload.html4.js"></script>
+<script type="text/javascript" src="/assets/backend/js/plugins/uploader/jquery.plupload.queue.js"></script>
+
+<script type="text/javascript" src="/assets/backend/js/plugins/tables/datatable.js"></script>
+<script type="text/javascript" src="/assets/backend/js/plugins/tables/tablesort.min.js"></script>
+<script type="text/javascript" src="/assets/backend/js/plugins/tables/resizable.min.js"></script>
+
+<script type="text/javascript" src="/assets/backend/js/plugins/ui/jquery.tipsy.js"></script>
+<script type="text/javascript" src="/assets/backend/js/plugins/ui/jquery.collapsible.min.js"></script>
+<script type="text/javascript" src="/assets/backend/js/plugins/ui/jquery.prettyPhoto.js"></script>
+<script type="text/javascript" src="/assets/backend/js/plugins/ui/jquery.progress.js"></script>
+<script type="text/javascript" src="/assets/backend/js/plugins/ui/jquery.timeentry.min.js"></script>
+<script type="text/javascript" src="/assets/backend/js/plugins/ui/jquery.colorpicker.js"></script>
+<script type="text/javascript" src="/assets/backend/js/plugins/ui/jquery.jgrowl.js"></script>
+<script type="text/javascript" src="/assets/backend/js/plugins/ui/jquery.breadcrumbs.js"></script>
+<script type="text/javascript" src="/assets/backend/js/plugins/ui/jquery.sourcerer.js"></script>
+
+<script type="text/javascript" src="/assets/backend/js/plugins/jquery.fullcalendar.js"></script>
+<script type="text/javascript" src="/assets/backend/js/plugins/jquery.elfinder.js"></script>
+
+<script type="text/javascript" src="/assets/backend/js/custom.js"></script>
+
+<script type="text/javascript" src="/assets/backend/js/charts/chart.js"></script>
+
+</head>
+
+<body>
+
+<!-- Left side content -->
+<div id="leftSide">
+    <div class="logo"><a href="/admin"><img src="/assets/frontend/default_images/logo.png" alt="" style="height: 75px;width: 150px;" /></a></div>
+
+    <!-- Left navigation -->
+    <ul id="menu" class="nav">
+{#        <li class="dash"><a href="/admin" title="{{trans('dashboard')}}" class="active"><span>{{trans('dashboard')}}</span></a></li>#}
+{#        <li class="files"><a href="/admin/articles" title="{{trans('articles_list')}}"><span>{{trans('articles_list')}}</span></a></li>#}
+{#        <li class="charts"><a href="/admin/article/create" title="{{trans('add_new_article')}}"><span>{{trans('add_new_article')}}</span></a></li>#}
+{#        <li class="files"><a href="/admin/comments" title="{{trans('review_comments')}}"><span>{{trans('review_comments')}}</span></a></li>#}
+{#        <li class="files"><a href="/admin/pages/list" title="{{trans('pages_list')}}"><span>{{trans('add_pages')}}</span></a></li>#}
+
+        <li class="dash {{ app.request.getPathInfo() starts with '/admin' and app.request.getPathInfo() == '/admin' ? 'active' : '' }}">
+            <a href="/admin" title="{{ trans('dashboard') }}"><span>{{  trans('dashboard') }}</span></a>
+        </li>
+        <li class="files {{ app.request.getPathInfo() starts with '/admin/articles' ? 'active' : '' }}">
+            <a href="/admin/articles" title="{{ trans('articles_list') }}"><span>{{ trans('articles_list') }}</span></a>
+        </li>
+        <li class="charts {{ app.request.getPathInfo() starts with '/admin/article/create' ? 'active' : '' }}">
+            <a href="/admin/article/create" title="{{ trans('add_new_article') }}"><span>{{ trans('add_new_article') }}</span></a>
+        </li>
+        <li class="files {{ app.request.getPathInfo() starts with '/admin/comments' ? 'active' : '' }}">
+            <a href="/admin/comments" title="{{ trans('review_comments') }}"><span>{{ trans('review_comments') }}</span></a>
+        </li>
+        <li class="files {{ app.request.getPathInfo() starts with '/admin/pages' ? 'active' : '' }}">
+            <a href="/admin/pages/list" title="{{ trans('pages_list') }}"><span>{{ trans('add_pages') }}</span></a>
+        </li>
+
+
+        {# <li class="typo"><a href="#" title="" class="exp"><span>Other pages</span><strong>3</strong></a>
+            <ul class="sub">
+                <li><a href="typography.html" title="">Typography</a></li>
+                <li><a href="calendar.html" title="">Calendar</a></li>
+                <li class="last"><a href="gallery.html" title="">Gallery</a></li>
+            </ul>
+        </li> #}
+    </ul>
+</div>
+
+
+<!-- Right side -->
+<div id="rightSide">
+
+    <!-- Top fixed navigation -->
+    <div class="topNav">
+        <div class="wrapper">
+            <div class="welcome"><a href="#" title=""><img src="/assets/backend/default_images/userPic.png" alt="" /></a><span>{{ page.meta_title|default('Jessica Jacobson') }}</span></div>
+            <div class="userNav">
+                <ul>
+                    <li><a href="#" title=""><img src="/assets/backend/default_images/icons/topnav/settings.png" alt="" /><span>Settings</span></a></li>
+                    <li><a href="login.html" title=""><img src="/assets/backend/default_images/icons/topnav/logout.png" alt="" /><span>Logout</span></a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Responsive header -->
+    <div class="resp">
+        <div class="respHead">
+            <a href="index.html" title=""><img src="/assets/backend/default_images/loginLogo.png" alt="" /></a>
+        </div>
+
+        <div class="cLine"></div>
+        <div class="smalldd">
+            <span class="goTo"><img src="/assets/backend/default_images/icons/light/home.png" alt="" />Dashboard</span>
+            <ul class="smallDropdown">
+                <li><a href="index.html" title=""><img src="/assets/backend/default_images/icons/light/home.png" alt="" />Dashboard</a></li>
+                <li><a href="charts.html" title=""><img src="/assets/backend/default_images/icons/light/stats.png" alt="" />Statistics and charts</a></li>
+                <li><a href="#" title="" class="exp"><img src="/assets/backend/default_images/icons/light/pencil.png" alt="" />Forms stuff<strong>4</strong></a>
+                    <ul>
+                        <li><a href="forms.html" title="">Form elements</a></li>
+                        <li><a href="form_validation.html" title="">Validation</a></li>
+                        <li><a href="form_editor.html" title="">WYSIWYG and file uploader</a></li>
+                        <li class="last"><a href="form_wizards.html" title="">Wizards</a></li>
+                    </ul>
+                </li>
+                <li><a href="ui_elements.html" title=""><img src="/assets/backend/default_images/icons/light/users.png" alt="" />Interface elements</a></li>
+                <li><a href="tables.html" title="" class="exp"><img src="/assets/backend/default_images/icons/light/frames.png" alt="" />Tables<strong>3</strong></a>
+                    <ul>
+                        <li><a href="table_static.html" title="">Static tables</a></li>
+                        <li><a href="table_dynamic.html" title="">Dynamic table</a></li>
+                        <li class="last"><a href="table_sortable_resizable.html" title="">Sortable &amp; resizable tables</a></li>
+                    </ul>
+                </li>
+                <li><a href="#" title="" class="exp"><img src="/assets/backend/default_images/icons/light/fullscreen.png" alt="" />Widgets and grid<strong>2</strong></a>
+                    <ul>
+                        <li><a href="widgets.html" title="">Widgets</a></li>
+                        <li class="last"><a href="grid.html" title="">Grid</a></li>
+                    </ul>
+                </li>
+                <li><a href="#" title="" class="exp"><img src="/assets/backend/default_images/icons/light/alert.png" alt="" />Error pages<strong>6</strong></a>
+                    <ul class="sub">
+                        <li><a href="403.html" title="">403 page</a></li>
+                        <li><a href="404.html" title="">404 page</a></li>
+                        <li><a href="405.html" title="">405 page</a></li>
+                        <li><a href="500.html" title="">500 page</a></li>
+                        <li><a href="503.html" title="">503 page</a></li>
+                        <li class="last"><a href="offline.html" title="">Website is offline</a></li>
+                    </ul>
+                </li>
+                <li><a href="file_manager.html" title=""><img src="/assets/backend/default_images/icons/light/files.png" alt="" />File manager</a></li>
+                <li><a href="#" title="" class="exp"><img src="/assets/backend/default_images/icons/light/create.png" alt="" />Other pages<strong>3</strong></a>
+                    <ul>
+                        <li><a href="typography.html" title="">Typography</a></li>
+                        <li><a href="calendar.html" title="">Calendar</a></li>
+                        <li class="last"><a href="gallery.html" title="">Gallery</a></li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+        <div class="cLine"></div>
+    </div>
+
+    <!-- Title area -->
+    <div class="titleArea">
+        <div class="wrapper">
+            <div class="pageTitle">
+                <h5>{{trans('dashboard')}}</h5>
+            </div>
+        </div>
+    </div>
+
+    <div class="line"></div>
+
+    <!-- Page statistics and control buttons area -->
+    <div class="statsRow">
+        <div class="wrapper">
+        	<div class="controlB">
+            	<ul>
+                    <li><a href="/admin/article/create" title="{{trans('add_new_article')}}"><img src="/assets/backend/default_images/icons/control/32/plus.png" alt="" /><span>{{trans('add_new_article')}}</span></a></li>
+                    <li><a href="/admin/articles" title="{{trans('articles_list')}}"><img src="/assets/backend/default_images/icons/control/32/order-149.png" alt="" /><span>{{trans('articles_list')}}</span></a></li>
+                    <li><a href="/admin/user/add" title="{{trans('add_new_user')}}"><img src="/assets/backend/default_images/icons/control/32/hire-me.png" alt="" /><span>{{trans('add_new_user')}}</span></a></li>
+                    <li><a href="/admin/comments" title="{{trans('review_comments')}}"><img src="/assets/backend/default_images/icons/control/32/comment.png"  alt="" /><span>{{trans('review_comments')}}</span></a></li>
+                    <li><a href="/admin/pages/list" title="{{trans('pages_list')}}"><img src="/assets/backend/default_images/icons/control/32/order-149.png" alt="" /><span>{{trans('pages_list')}}</span></a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div class="line"></div>
+
+    {%block content%}
+
+    {%endblock%}
+
+    <!-- Footer line -->
+    <div id="footer">
+        <div class="wrapper">NeuroSite CMS Powored by SDOKY SA <a href="https://www.neurosite.ch/" title="">NeuroSite</a></div>
+    </div>
+
+</div>
+
+</body>
+</html>

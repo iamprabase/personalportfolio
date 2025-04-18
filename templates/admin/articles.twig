@@ -1,0 +1,59 @@
+    {% extends 'admin/layout.twig' %}
+
+    {% block title %}{{ trans('articles') }}{% endblock %}
+
+    {% block content %}
+    <!-- Main content wrapper -->
+    <div class="wrapper">
+
+      <!-- Dynamic table -->
+        <div class="widget">
+            <div class="title"><h6>{{trans('users_list')}}</h6></div>
+            <table class="display dTable">
+              <thead>
+                <tr>
+                    <th>{{trans('article_title')}}</th>
+                    <th>{{trans('article_content')}}</th>
+                    <th>{{trans('article_publisher')}}</th>
+                    <th>{{trans('article_published_date')}}</th>
+                    <th>{{trans('action')}}</th>
+                </tr>
+              </thead>
+                <tbody>
+              {% for article in articles %}
+                <tr class="gradeX">
+                  <td>{{article.title}}</td>
+                  <td>{{article.content | striptags | slice(0, 150) ~ '...'  }}</td>
+                  <td>{{article.publisher}}</td>
+                  <td>{{article.publication_date|date("F j, Y") }}</td>
+                  <td class="center" style="border-left-color: rgb(203, 203, 203);">
+
+{#                      {% set profilePic = article.profile_picture is not empty ? article.profile_picture : '/assets/frontend/default_images/banner.jpg' %}#}
+
+{#                      <a href="{{ profilePic }}" title="" rel="lightbox">#}
+{#                          <img src="{{ profilePic }}" alt="" style="width: 50px;height: 50px;">#}
+{#                      </a>#}
+{#                      <a href="{{article.profile_picture}}" title="" rel="lightbox"><img src="{{article.profile_picture}}" alt="" style="width: 50px;height: 50px;">#}
+{#                      </a>#}
+                      <button>
+                          <a href="/admin/article/edit/{{ article.id }}" class="edit-article-btn">Edit | </a>
+                      </button>
+
+                      <form action="/admin/article/delete/{{ article.id }}" method="POST" style="display: inline;">
+                          <input type="hidden" name="{{ csrf.token_name_key }}" value="{{ csrf.token_name }}">
+                          <input type="hidden" name="{{ csrf.token_value_key }}" value="{{ csrf.token_value }}">
+                          <button type="submit" class="delete-article-btn" onclick="return confirm('Are you sure you want to delete this article?');">Delete</button>
+                      </form>
+                  </td>
+                </tr>
+              {% endfor %}
+
+            </tbody>
+          </table>
+        </div>
+
+    </div>
+    {% endblock %}
+
+
+

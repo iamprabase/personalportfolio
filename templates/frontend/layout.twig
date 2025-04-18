@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="{{ pageLanguage|default('fr') }}" class="no-js">
+<head>
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-Y06QXLWQBY"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag() {
+      dataLayer.push(arguments);
+    }
+    gtag('js', new Date());
+    gtag('config', 'G-Y06QXLWQBY');
+  </script>
+  <!-- META TAGS -->
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <title>{% block title %}{{ page.meta_title|default('Jessica Jacobson') }}{% endblock %}</title>
+  <meta name="description" content="{{ page.meta_description|default('Author website CMS') }}">
+  <link rel="canonical" href="{{ page.canonical_url|default('https://www.jessicajacobson.com') }}">
+  <!-- Open Graph Tags -->
+  <meta property="og:title" content="{{ page.meta_title|default('Jessica Jacobson') }}">
+  <meta property="og:description" content="{{ page.meta_description|default('Author website CMS') }}">
+  <meta property="og:url" content="{{ page.canonical_url|default('https://www.jessicajacobson.com') }}">
+  <meta name="reply-to" content="support@jessicajacobson.com">
+  <!-- Stylesheets -->
+  <link href="/assets/frontend/css/media_query.css" rel="stylesheet" type="text/css" />
+  <link href="/assets/frontend/css/bootstrap.css" rel="stylesheet" type="text/css" />
+  <link href="/assets/frontend/css/font-awesome/font-awesome.min.css" rel="stylesheet" type="text/css" /> 
+  <link href="/assets/frontend/css/animate.css" rel="stylesheet" type="text/css" />
+  <link href="https://fonts.googleapis.com/css?family=Poppins" rel="stylesheet">
+  <link href="/assets/frontend/css/owl.carousel.css" rel="stylesheet" type="text/css" />
+  <link href="/assets/frontend/css/owl.theme.default.css" rel="stylesheet" type="text/css" />
+  <link href="/assets/frontend/css/style_1.css" rel="stylesheet" type="text/css" />
+  <script src="/assets/frontend/js/modernizr-3.5.0.min.js"></script>
+  {% block head %}{% endblock %}
+
+  <style>
+  .fh5co_news_img > img {
+    height: 260px;
+    width: auto!important;
+  }
+
+  div.fh5co_news_img {
+    height: auto!important;
+  }
+  </style>
+</head>
+<body>
+  {% block header %}
+  <div class="container-fluid">
+    <div class="container">
+      <div class="row align-items-center">
+        <div class="col-12 col-md-2 fh5co_padding_menu">
+          <img src="/assets/frontend/default_images/logo.png" alt="Jessica Jacobson Logo" class="fh5co_logo_width" />
+        </div>
+        <div class="col-12 col-md-10 text-right d-flex align-items-center justify-content-end">
+
+          <div class="text-center d-inline-block">
+            <a class="fh5co_display_table">
+              <div class="fh5co_verticle_middle"><i class="fa fa-linkedin"></i></div>
+            </a>
+          </div>
+          <div class="text-center d-inline-block">
+            <a class="fh5co_display_table">
+              <div class="fh5co_verticle_middle"><i class="fa fa-google-plus"></i></div>
+            </a>
+          </div>
+          <div class="text-center d-inline-block">
+            <a href="https://twitter.com/fh5co" target="_blank" class="fh5co_display_table">
+              <div class="fh5co_verticle_middle"><i class="fa fa-twitter"></i></div>
+            </a>
+          </div>
+          <div class="text-center d-inline-block">
+            <a href="https://fb.com/fh5co" target="_blank" class="fh5co_display_table">
+              <div class="fh5co_verticle_middle"><i class="fa fa-facebook"></i></div>
+            </a>
+          </div>
+          <!--<div class="d-inline-block text-center"><img src="images/country.png" alt="img" class="fh5co_country_width"/></div>-->
+
+          {% if not logged_in_user %}
+            <div class="d-inline-block text-center">
+              <!-- Login Form -->
+              <form method="post" action="{{'/login'}}" class="login-form d-flex align-items-center" enctype="multipart/form-data">
+                <input type="hidden" name="{{ csrf.token_name_key }}" value="{{ csrf.token_name }}">
+                <input type="hidden" name="{{ csrf.token_value_key }}" value="{{ csrf.token_value }}">
+                
+                <input type="text" class="form-control login-input" name="username" id="username" placeholder="{{ trans('username') }}" required>
+                <input type="password" class="form-control login-input" name="password" id="password" placeholder="{{ trans('password') }}" required>
+                <button type="submit" class="btn btn-login">{{ trans('login') }}</button>
+              </form>
+            </div>
+            <!-- Register Button -->
+            <a href="/register" class="btn btn-register ml-2">{{ trans('register') }}</a>
+          {% else %}
+            <a href="/logout" class="btn btn-register ml-2">{{ trans('logout') }}</a>
+          {% endif %}
+         
+          <div class="d-inline-block text-center language-selector">
+            <form action="/change-language" method="get">
+                <select class="form-control fh5co_text_select_option" name="lang" onchange="this.form.submit()">
+                    {% for lang in languages %}
+                        <option value="{{ lang.code }}" {% if lang.code == pageLanguage %}selected{% endif %}>{{ lang.code }}</option>
+                    {% endfor %}
+                </select>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  {% endblock %}
+
+  {% block navbar %}
+  <div class="container-fluid bg-faded fh5co_padd_mediya padding_786">
+    <div class="container padding_786">
+      <nav class="navbar navbar-toggleable-md navbar-light">
+        <button class="navbar-toggler navbar-toggler-right mt-3" type="button" data-toggle="collapse"
+          data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false"
+          aria-label="Toggle navigation"><span class="fa fa-bars"></span></button>
+        <a class="navbar-brand" href="#"><img src="/assets/frontend/default_images/logo.png" alt="img" class="mobile_logo_width" /></a>
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+          <ul class="navbar-nav mr-auto">
+            <li class="nav-item active">
+              <a class="nav-link" href="/">{{ trans('home') }} <span class="sr-only">(current)</span></a>
+            </li>
+            <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle" href="#" id="dropdownMenuButton2" data-toggle="dropdown"
+                aria-haspopup="true" aria-expanded="false">{{trans('jessica_jacobson')}}</a>
+              <div class="dropdown-menu" aria-labelledby="dropdownMenuLink_1">
+                <a class="dropdown-item" href="#">{{ trans('who_am_i') }}</a>
+                <a class="dropdown-item" href="#">{{ trans('my_journey') }}</a>
+                <a class="dropdown-item" href="#">{{ trans('my_hobbies') }}</a>
+                <a class="dropdown-item" href="#">{{ trans('my_favorite_books') }}</a>
+                <a class="dropdown-item" href="#">{{ trans('contact_me') }}</a>
+              </div>
+            </li>
+            <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle" href="#" id="dropdownMenuButton2" data-toggle="dropdown"
+                aria-haspopup="true" aria-expanded="false">{{trans('heart_at_altitude')}}</a>
+              <div class="dropdown-menu" aria-labelledby="dropdownMenuLink_1">
+                {% for page in dynamicPages %}
+                    <a class="dropdown-item" href="#">{{ page.title }}</a>
+                {% endfor %}
+              </div>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="Contact_us.html">{{trans('publications')}}</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="Contact_us.html">{{trans('writing_workshop')}}</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="Contact_us.html">{{trans('media')}}</a>
+            </li>
+          </ul>
+        </div>
+      </nav>
+    </div>
+  </div>
+  {% endblock %}
+
+  {% block banner_content %}
+  <div class="container-fluid paddding mb-5">
+    <div class="row mx-0">
+      <div class="col-12 paddding animate-box" data-animate-effect="fadeIn">
+        <div class="fh5co_suceefh5co_height"><img src="/assets/frontend/default_images/banner.jpg" alt="img" />
+          <div class="fh5co_suceefh5co_height_position_absolute"></div>
+          <div class="fh5co_suceefh5co_height_position_absolute_font">
+            {% block article_banner_date %}
+            
+            {% endblock %}
+            <div class="">
+              <a href="#" class="fh5co_good_font"> 
+                {% block banner_title %}
+                  Jessica Jacobson: passionnée de psychologie sociale et d'écriture
+                {% endblock %}
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+            
+    {% if errors %}
+      <div class="alert alert-danger mt-4">
+        <ul class="mb-0">
+          {% for field, messages in errors %}
+            {% for message in messages %}
+              <li><strong>{{ field|capitalize }}:</strong> {{ message }}</li>
+            {% endfor %}
+          {% endfor %}
+        </ul>
+      </div>
+    {% endif %}
+  {% endblock %}
+
+  {% block content %}
+
+  {% endblock %}
+
+  {% block footer %}
+  <div class="container-fluid fh5co_footer_right_reserved">
+    <div class="container">
+      <div class="row">
+        <div class="col-12 col-md-12 py-4 Reserved">© Copyright 2024 Jessica Jacobson. Terms and Conditions. Design by <a
+            href="https://freehtml5.co" title="Free HTML5 Bootstrap templates">FreeHTML5.co</a>.</div>
+        {# <div class="col-12 col-md-6 spdp_right py-4">
+          <a href="#" class="footer_last_part_menu">Home</a>
+          <a href="Contact_us.html" class="footer_last_part_menu">About</a>
+          <a href="Contact_us.html" class="footer_last_part_menu">Contact</a>
+          <a href="blog.html" class="footer_last_part_menu">Latest News</a>
+        </div> #}
+      </div>
+    </div>
+  </div>
+  {% endblock %}
+
+  <div class="gototop js-top">
+    <a href="#" class="js-gotop"><i class="fa fa-arrow-up"></i></a>
+  </div>
+
+  <script src="/assets/frontend/js/jquery.min.js"></script>
+  <script src="/assets/frontend/js/owl.carousel.min.js"></script>
+  <script src="/assets/frontend/js/tether.min.js"></script>
+  <script src="/assets/frontend/js/bootstrap.min.js"></script>
+  <script src="/assets/frontend/js/jquery.waypoints.min.js"></script>
+  <script src="/assets/frontend/js/main.js"></script>
+</body>
+</html>
