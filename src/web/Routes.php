@@ -69,7 +69,10 @@
         $group->get('/pages/create', [AdminController::class, 'createPage']);
         $group->post('/article/create', [AdminController::class, 'store']);
         $group->get('/article/edit/{id}', [AdminController::class, 'edit']);
+        $group->get('/page/edit/{id}', [AdminController::class, 'editPage']);
         $group->post('/article/edit/{id}', [AdminController::class, 'update']);
+        $group->post('/page/edit/{id}', [AdminController::class, 'updatePage']);
         $group->post('/article/delete/{id}', [AdminController::class, 'delete']);
+        $group->post('/page/delete/{id}', [AdminController::class, 'deletePage']);
       })->add(new AdminMiddleware());
   };

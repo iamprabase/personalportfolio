@@ -362,12 +362,16 @@ class AdminController extends BaseController
    }
 
   // // Delete a page
-  // public function deletePage(ServerRequestInterface $request, ResponseInterface $response, array $args): ResponseInterface {
-  //     $id = $args['id'];
-  //     $this->pageModel->deletePage($id);
-  //     $response->getBody()->write("Page deleted successfully!");
-  //     return $response;
-  // }
+   public function deletePage(ServerRequestInterface $request, ResponseInterface $response, array $args): ResponseInterface {
+     $id = $args['id'];
+     $page = $this->pageModel->getPageById($id);
+
+     $this->pageModel->deletePage($id);
+
+     $this->flash->addMessage('success', 'Page deleted successfully!');
+
+     return $response->withHeader('Location', '/admin/pages')->withStatus(302);
+   }
 
   // HELPER METHODS
   private function handleFileUpload($file, string $directory, ?string $oldFilePath = null): ?string
