@@ -25,6 +25,8 @@ class CustomErrorHandler implements ErrorHandlerInterface
         bool $logErrorDetails
     ): ResponseInterface {
         $response = new Response();
+        var_dump($exception->getMessage());
+        die;
 
         return $this->twig->render($response->withStatus(500), 'errors/500.twig', [
             'message' => $displayErrorDetails ? $exception->getMessage() : 'An unexpected error occurred.'

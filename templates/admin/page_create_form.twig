@@ -1,0 +1,84 @@
+{% extends 'admin/layout.twig' %}
+
+{% block title %}{{ article ? 'Edit' : 'New' }} Page {% endblock %}
+
+{% block content %}
+    <!-- Main content wrapper -->
+    <div class="wrapper">
+
+        <!-- Note -->
+{#            <div class="nNote nInformation hideit">#}
+{#                <p><strong>INFORMATION: </strong>Form elements were divided into 4 different pages. Don't forget to check all of them!</p>#}
+{#            </div>#}
+
+        <!-- Form -->
+        <form class="form" action="{{ page.id is defined ? ('/admin/page/edit/' ~ page.id) : ('/admin/page/create') }}" method="post" enctype="multipart/form-data">
+
+            <input type="hidden" name="{{ csrf.token_name_key }}" value="{{ csrf.token_name }}">
+            <input type="hidden" name="{{ csrf.token_value_key }}" value="{{ csrf.token_value }}">
+
+            <fieldset>
+                <div class="widget">
+                    <div class="title">
+                        <img src="/assets/backend/default_images/icons/dark/list.png" alt="" class="titleIcon"><h6>{{ article ? 'Edit' : 'New' }} Page </h6>
+                    </div>
+                    <div class="formRow">
+                        <label>{{trans('post_title')}}</label>
+                        <div class="formRight">
+                            <input type="text" name="title" id="title" value="{{ article.title | default('') }}" required>
+                        </div>
+                    </div>
+                    <div class="formRow">
+                        <label for="labelFor">{{trans('post_description')}}</label>
+                        <div class="formRight">
+                            <textarea name="content" id="content-editor">{{ article.content | default('') }}</textarea>
+                        </div>
+                    </div>
+
+                    <div class="formRow">
+                        <label>{{trans('page_parent')}}</label>
+                        <div class="formRight">
+                            <select class="form-control fh5co_text_select_option" name="page_parent" onchange="this.form.submit()">
+                                <option value="">Select Option</option>
+                                {% for p in pages %}
+
+
+                                <option value="{{ p.id }}" {% if page and p.id is same as page.id %} selected {% endif %}>{{ p.title }}</option>
+                                    >{{ p.title }}</option>
+
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                    <div class="formRow">
+                    <button type="submit">{{ article ? 'Update' : 'Create' }} Article</button>
+                    </div>
+
+                </div>
+            </fieldset>
+        </form>
+
+    </div>
+
+<!-- TinyMCE Integration -->
+<script src="/assets/frontend/js/tinymce/tinymce.min.js"></script>
+
+<script type="text/javascript">
+  // Ensure TinyMCE is initialized when the page loads
+  window.onload = function() {
+      tinymce.init({
+          selector: '#content-editor', // The textarea you want to turn into TinyMCE
+          plugins: 'advlist autolink lists link image charmap print preview',
+          toolbar: 'undo redo | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist | link image',
+          menubar: false,
+          setup: function(editor) {
+              // Set the content from the backend (Twig variable)
+              editor.on('init', function() {
+                  editor.setContent(`{{ article.content | default('') | escape('js') }}`);
+              });
+          }
+      });
+  };
+</script>
+
+{% endblock %}

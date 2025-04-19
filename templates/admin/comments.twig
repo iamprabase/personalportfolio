@@ -27,9 +27,9 @@
                         <td>{{comment.publisher  }}</td>
                         <td>{{comment.comment_date|date("F j, Y") }}</td>
                         <td class="center" style="border-left-color: rgb(203, 203, 203);">
-                            <button>
-                                <a href="#" class="tm-color-primary small edit-comment-link">{{ trans('edit') }}</a>
-                            </button>
+{#                            <button>#}
+{#                                <a href="#" class="tm-color-primary small edit-comment-link">{{ trans('edit') }}</a>#}
+{#                            </button>#}
                             <form action="/comments/{{ comment.id }}/delete" method="POST" style="display: inline;">
 
                                 <input type="hidden" name="{{ csrf.token_name_key }}" value="{{ csrf.token_name }}">

@@ -33,16 +33,17 @@ CREATE TABLE articles (
 -- Pages table
 CREATE TABLE pages (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    identifier VARCHAR(100) NOT NULL,
+    page_parent_id INT,
     title VARCHAR(255) NOT NULL,
-    subtitle VARCHAR(255),
     content TEXT NOT NULL,
     slug VARCHAR(255) UNIQUE NOT NULL,
     meta_title VARCHAR(255),
     meta_description TEXT,
     canonical_url VARCHAR(255),
     language VARCHAR(10),
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (page_parent_id) REFERENCES pages(id)
+
 );
 
 -- Languages table

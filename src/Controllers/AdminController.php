@@ -6,6 +6,7 @@ use Psr\Http\Message\ServerRequestInterface;
 use App\Models\ArticleModel;
 use App\Models\UserModel;
 use App\Models\CommentModel;
+use App\Models\PageModel;
 use App\Utils\Validator;
 use Cocur\Slugify\Slugify;
 use Slim\Csrf\Guard;
@@ -14,6 +15,7 @@ class AdminController extends BaseController
 {
   protected $articleModel;
   protected $commentModel;
+  protected $pageModel;
   protected $userModel;
 
   private static $config = null; // Holds the configuration
@@ -24,6 +26,7 @@ class AdminController extends BaseController
 
     $this->articleModel = new ArticleModel();
     $this->commentModel = new CommentModel();
+    $this->pageModel = new PageModel();
     $this->userModel = new UserModel();
   }
 
@@ -62,6 +65,35 @@ class AdminController extends BaseController
         'canonical_url' => self::$config['canonical_url'],
         'language' => self::$config['language'],
       ],
+    ]);
+  }
+
+
+  /**
+   * Return Article Lists page
+   */
+  public function listPages(ServerRequestInterface $request, ResponseInterface $response): ResponseInterface
+  {
+    $queryParams = $request->getQueryParams();
+    $page = isset($queryParams['page']) ? (int) $queryParams['page'] : 1;
+    $perPage = $totalPageLists = $this->pageModel->getTotalPages();
+
+    $pages = $this->pageModel->getPaginatedPages($page, $perPage);
+
+    $totalPages = $totalPageLists > 0 ? ceil($totalPageLists / $perPage) : 0;
+
+    $this->addCsrfToView($request);
+
+    return $this->view->render($response, 'admin/pages.twig', [
+        'pages' => $pages,
+        'currentPage' => $page,
+        'totalPages' => $totalPages,
+        'page' => [
+            'meta_title' => self::$config['meta_title'],
+            'meta_description' => self::$config['meta_description'],
+            'canonical_url' => self::$config['canonical_url'],
+            'language' => self::$config['language'],
+        ],
     ]);
   }
 
@@ -162,7 +194,7 @@ class AdminController extends BaseController
 
     $this->flash->addMessage('success', 'Article created successfully!');
 
-    return $response->withHeader('Location', '/admin')->withStatus(302);
+    return $response->withHeader('Location', '/admin/articles')->withStatus(302);
   }
 
   public function edit(ServerRequestInterface $request, ResponseInterface $response, array $args): ResponseInterface
@@ -217,7 +249,7 @@ class AdminController extends BaseController
 
     $this->flash->addMessage('success', 'Article updated successfully!');
 
-    return $response->withHeader('Location', '/admin')->withStatus(302);
+    return $response->withHeader('Location', '/admin/articles')->withStatus(302);
   }
 
   public function delete(ServerRequestInterface $request, ResponseInterface $response, array $args): ResponseInterface
@@ -234,7 +266,7 @@ class AdminController extends BaseController
 
     $this->flash->addMessage('success', 'Article deleted successfully!');
 
-    return $response->withHeader('Location', '/admin')->withStatus(302);
+    return $response->withHeader('Location', '/admin/articles')->withStatus(302);
   }
 
   // PAGE MANAGEMENT (similar structure as articles, for CMS pages)
@@ -245,32 +277,89 @@ class AdminController extends BaseController
   }
 
   // Process new page creation
-  // public function createPage(ServerRequestInterface $request, ResponseInterface $response): ResponseInterface {
-  //     $data = $request->getParsedBody();
-  //     $this->pageModel->createPage($data['title'], $data['content'], $data['meta_title'], $data['meta_description'], $data['canonical_url'], $data['language']);
-  //     $response->getBody()->write("Page created successfully!");
-  //     return $response;
-  // }
+   public function createPage(ServerRequestInterface $request, ResponseInterface $response): ResponseInterface {
+     $this->addCsrfToView($request); // Use the method from BaseController
+
+     $queryParams = $request->getQueryParams();
+     $page = isset($queryParams['page']) ? (int) $queryParams['page'] : 1;
+     $perPage = $totalPageLists = $this->pageModel->getTotalPages();
+
+     $pages_lists =  $this->pageModel->getPaginatedPages($page, $totalPageLists);
+
+     return $this->view->render($response, 'admin/page_create_form.twig', ['page' => null, 'pages' => $pages_lists]);
+   }
+
+    // Process new page creation
+    public function storePage(ServerRequestInterface $request, ResponseInterface $response): ResponseInterface {
+
+      $data = $request->getParsedBody();
+
+      $rules = [
+          'title' => 'required|min:3|max:255',
+          'content' => 'required|min:10',
+      ];
+
+      $validator = new Validator();
+      if (!$validator->validate($data, $rules)) {
+        $this->addCsrfToView($request);
+        $errors = $validator->getErrors();
+        return $this->view->render($response, 'admin/page_create_form.twig', [
+            'errors' => $errors,
+            'article' => $data
+        ]);
+      }
+
+      $slug = (new Slugify())->slugify($data['title']);
+
+      $this->articleModel->createPage($data['title'], $data['content'], $slug, $data['page_parent'] );
+
+      $this->flash->addMessage('success', 'Page created successfully!');
+
+      return $response->withHeader('Location', '/admin/pages')->withStatus(302);
+    }
 
   // // Edit a page (display current values)
-  // public function editPage(ServerRequestInterface $request, ResponseInterface $response, array $args): ResponseInterface {
-  //     $id = $args['id'];
-  //     $page = $this->pageModel->getPageById($id);
-  //     if (!$page) {
-  //         $response->getBody()->write("Page not found");
-  //         return $response->withStatus(404);
-  //     }
-  //     return $this->view->render($response, 'admin/edit_page.twig', ['page' => $page]);
-  // }
+   public function editPage(ServerRequestInterface $request, ResponseInterface $response, array $args): ResponseInterface {
+     $id = $args['id'];
+     $page = $this->pageModel->getPageById($id);
+     if (!$page) {
+       return $response->withStatus(404)->write("Page not found");
+     }
+
+     $this->addCsrfToView($request); // Use the method from BaseController
+     return $this->view->render($response, 'admin/page_create_form.twig', ['page' => $page]);
+   }
 
   // // Process page update
-  // public function updatePage(ServerRequestInterface $request, ResponseInterface $response, array $args): ResponseInterface {
-  //     $id = $args['id'];
-  //     $data = $request->getParsedBody();
-  //     $this->pageModel->updatePage($id, $data['title'], $data['content'], $data['meta_title'], $data['meta_description'], $data['canonical_url'], $data['language']);
-  //     $response->getBody()->write("Page updated successfully!");
-  //     return $response;
-  // }
+   public function updatePage(ServerRequestInterface $request, ResponseInterface $response, array $args): ResponseInterface {
+       $id = $args['id'];
+       $data = $request->getParsedBody();
+
+       $rules = [
+           'title' => 'required|min:3|max:255',
+           'content' => 'required|min:10',
+       ];
+
+       $validator = new Validator();
+       if (!$validator->validate($data, $rules)) {
+         $this->addCsrfToView($request);
+         $errors = $validator->getErrors();
+         $article = $this->articleModel->getArticleById($id);
+         return $this->view->render($response, 'admin/page_create_form.twig', [
+             'errors' => $errors,
+             'article' => array_merge($article, $data)
+         ]);
+       }
+
+       $page = $this->pageModel->getPageById($id);
+       $slug = (new Slugify())->slugify($data['title']);
+
+       $this->pageModel->updatePage($id, $data['title'], $data['content'], $slug, $data['page_parent']);
+
+       $this->flash->addMessage('success', 'Page updated successfully!');
+
+       return $response->withHeader('Location', '/admin/pages')->withStatus(302);
+   }
 
   // // Delete a page
   // public function deletePage(ServerRequestInterface $request, ResponseInterface $response, array $args): ResponseInterface {

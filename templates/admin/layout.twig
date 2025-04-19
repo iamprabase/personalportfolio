@@ -73,10 +73,10 @@
 {#        <li class="files"><a href="/admin/articles" title="{{trans('articles_list')}}"><span>{{trans('articles_list')}}</span></a></li>#}
 {#        <li class="charts"><a href="/admin/article/create" title="{{trans('add_new_article')}}"><span>{{trans('add_new_article')}}</span></a></li>#}
 {#        <li class="files"><a href="/admin/comments" title="{{trans('review_comments')}}"><span>{{trans('review_comments')}}</span></a></li>#}
-{#        <li class="files"><a href="/admin/pages/list" title="{{trans('pages_list')}}"><span>{{trans('add_pages')}}</span></a></li>#}
+{#        <li class="files"><a href="/admin/pages" title="{{trans('pages_list')}}"><span>{{trans('add_pages')}}</span></a></li>#}
 
         <li class="dash {{ app.request.getPathInfo() starts with '/admin' and app.request.getPathInfo() == '/admin' ? 'active' : '' }}">
-            <a href="/admin" title="{{ trans('dashboard') }}"><span>{{  trans('dashboard') }}</span></a>
+            <a href="/admin" title="{{ trans('dashboard') }}"><span>{{  trans('users_list') }}</span></a>
         </li>
         <li class="files {{ app.request.getPathInfo() starts with '/admin/articles' ? 'active' : '' }}">
             <a href="/admin/articles" title="{{ trans('articles_list') }}"><span>{{ trans('articles_list') }}</span></a>
@@ -88,8 +88,12 @@
             <a href="/admin/comments" title="{{ trans('review_comments') }}"><span>{{ trans('review_comments') }}</span></a>
         </li>
         <li class="files {{ app.request.getPathInfo() starts with '/admin/pages' ? 'active' : '' }}">
-            <a href="/admin/pages/list" title="{{ trans('pages_list') }}"><span>{{ trans('add_pages') }}</span></a>
+            <a href="/admin/pages" title="{{ trans('pages_list') }}"><span>{{ trans('pages_list') }}</span></a>
         </li>
+        <li class="files {{ app.request.getPathInfo() starts with '/admin/pages/create' ? 'active' : '' }}">
+            <a href="/admin/pages/create" title="{{trans('add_new_page')}}"><span>{{trans('add_new_page')}}</span></a>
+        </li>
+
 
 
         {# <li class="typo"><a href="#" title="" class="exp"><span>Other pages</span><strong>3</strong></a>
@@ -196,7 +200,8 @@
                     <li><a href="/admin/articles" title="{{trans('articles_list')}}"><img src="/assets/backend/default_images/icons/control/32/order-149.png" alt="" /><span>{{trans('articles_list')}}</span></a></li>
                     <li><a href="/admin/user/add" title="{{trans('add_new_user')}}"><img src="/assets/backend/default_images/icons/control/32/hire-me.png" alt="" /><span>{{trans('add_new_user')}}</span></a></li>
                     <li><a href="/admin/comments" title="{{trans('review_comments')}}"><img src="/assets/backend/default_images/icons/control/32/comment.png"  alt="" /><span>{{trans('review_comments')}}</span></a></li>
-                    <li><a href="/admin/pages/list" title="{{trans('pages_list')}}"><img src="/assets/backend/default_images/icons/control/32/order-149.png" alt="" /><span>{{trans('pages_list')}}</span></a></li>
+                      <li><a href="/admin/pages" title="{{trans('pages_list')}}"><img src="/assets/backend/default_images/icons/control/32/order-149.png" alt="" /><span>{{trans('pages_list')}}</span></a></li>
+                      <li><a href="/admin/pages/create" title="{{trans('add_new_page')}}"><img src="/assets/backend/default_images/icons/control/32/plus.png" alt="" /><span>{{trans('add_new_page')}}</span></a></li>
                 </ul>
             </div>
         </div>
