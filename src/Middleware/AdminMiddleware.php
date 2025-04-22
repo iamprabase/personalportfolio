@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 namespace App\Middleware;
 
@@ -12,7 +12,7 @@ class AdminMiddleware {
         if (!isset($_SESSION['user'])) {
             // Redirect to login if not authenticated
             $response = new \Slim\Psr7\Response();
-            return $response->withHeader('Location', '/login')->withStatus(302);
+            return $response->withHeader('Location', '/')->withStatus(302);
         }
         elseif(isset($_SESSION['user']) && !isset($_SESSION['user']['is_admin'])) {
             // Redirect to home if not an admin
