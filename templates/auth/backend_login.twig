@@ -1,0 +1,108 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
+<title>{% block title %}{{ page.meta_title|default('NeuroSite – The lightweight, AI-powered CMS that makes your site fast, easy to manage, and SEO-smart by design.') }}{% endblock %}</title>
+<link href="/assets/backend/css/main.css" rel="stylesheet" type="text/css" />
+
+<script type="text/javascript" src="/assets/backend/js/jquery.min.js"></script>
+<script type="text/javascript" src="/assets/backend/js/jquery-ui.min.js"></script>
+
+<script type="text/javascript" src="/assets/backend/js/plugins/spinner/jquery.mousewheel.js"></script>
+
+<script type="text/javascript" src="/assets/backend/js/plugins/charts/excanvas.min.js"></script>
+<script type="text/javascript" src="/assets/backend/js/plugins/charts/jquery.sparkline.min.js"></script>
+
+<script type="text/javascript" src="/assets/backend/js/plugins/forms/uniform.js"></script>
+<script type="text/javascript" src="/assets/backend/js/plugins/forms/jquery.cleditor.js"></script>
+<script type="text/javascript" src="/assets/backend/js/plugins/forms/jquery.validationEngine-en.js"></script>
+<script type="text/javascript" src="/assets/backend/js/plugins/forms/jquery.validationEngine.js"></script>
+<script type="text/javascript" src="/assets/backend/js/plugins/forms/jquery.tagsinput.min.js"></script>
+<script type="text/javascript" src="/assets/backend/js/plugins/forms/jquery.autosize.js"></script>
+<script type="text/javascript" src="/assets/backend/js/plugins/forms/jquery.maskedinput.min.js"></script>
+<script type="text/javascript" src="/assets/backend/js/plugins/forms/jquery.dualListBox.js"></script>
+<script type="text/javascript" src="/assets/backend/js/plugins/forms/jquery.inputlimiter.min.js"></script>
+<script type="text/javascript" src="/assets/backend/js/plugins/forms/chosen.jquery.min.js"></script>
+
+<script type="text/javascript" src="/assets/backend/js/plugins/wizard/jquery.form.js"></script>
+<script type="text/javascript" src="/assets/backend/js/plugins/wizard/jquery.validate.min.js"></script>
+<script type="text/javascript" src="/assets/backend/js/plugins/wizard/jquery.form.wizard.js"></script>
+
+<script type="text/javascript" src="/assets/backend/js/plugins/uploader/plupload.js"></script>
+<script type="text/javascript" src="/assets/backend/js/plugins/uploader/plupload.html5.js"></script>
+<script type="text/javascript" src="/assets/backend/js/plugins/uploader/plupload.html4.js"></script>
+<script type="text/javascript" src="/assets/backend/js/plugins/uploader/jquery.plupload.queue.js"></script>
+
+<script type="text/javascript" src="/assets/backend/js/plugins/tables/datatable.js"></script>
+<script type="text/javascript" src="/assets/backend/js/plugins/tables/tablesort.min.js"></script>
+<script type="text/javascript" src="/assets/backend/js/plugins/tables/resizable.min.js"></script>
+
+<script type="text/javascript" src="/assets/backend/js/plugins/ui/jquery.tipsy.js"></script>
+<script type="text/javascript" src="/assets/backend/js/plugins/ui/jquery.collapsible.min.js"></script>
+<script type="text/javascript" src="/assets/backend/js/plugins/ui/jquery.prettyPhoto.js"></script>
+<script type="text/javascript" src="/assets/backend/js/plugins/ui/jquery.progress.js"></script>
+<script type="text/javascript" src="/assets/backend/js/plugins/ui/jquery.timeentry.min.js"></script>
+<script type="text/javascript" src="/assets/backend/js/plugins/ui/jquery.colorpicker.js"></script>
+<script type="text/javascript" src="/assets/backend/js/plugins/ui/jquery.jgrowl.js"></script>
+<script type="text/javascript" src="/assets/backend/js/plugins/ui/jquery.breadcrumbs.js"></script>
+<script type="text/javascript" src="/assets/backend/js/plugins/ui/jquery.sourcerer.js"></script>
+
+<script type="text/javascript" src="/assets/backend/js/plugins/jquery.fullcalendar.js"></script>
+<script type="text/javascript" src="/assets/backend/js/plugins/jquery.elfinder.js"></script>
+
+<script type="text/javascript" src="/assets/backend/js/custom.js"></script>
+
+</head>
+
+<body class="nobg loginPage">
+
+<!-- Top fixed navigation -->
+<div class="topNav">
+    <div class="wrapper">
+        <div class="userNav">
+            <ul>
+                <li><a href="/" title=""><img src="/assets/backend/default_images/icons/topnav/mainWebsite.png" alt="" /><span>Main website</span></a></li>
+               
+            </ul>
+        </div>
+    </div>
+</div>
+
+
+<!-- Main content wrapper -->
+<div class="loginWrapper">
+    <div class="loginLogo"><img src="/assets/backend/default_images/loginLogo.png" alt="" /></div>
+    <div class="widget">
+        <div class="title"><img src="/assets/backend/default_images/icons/dark/files.png" alt="" class="titleIcon" /><h6>Console d'administration</h6></div>
+        <form method="post" action="{{'/login'}}" id="validate" class="form">
+          <input type="hidden" name="{{ csrf.token_name_key }}" value="{{ csrf.token_name }}">
+          <input type="hidden" name="{{ csrf.token_value_key }}" value="{{ csrf.token_value }}">
+            <fieldset>
+                <div class="formRow">
+                    <label for="login">Utilisateur :</label>
+                    <div class="loginInput"><input type="text" name="username" class="validate[required]" id="login" /></div>
+                </div>
+                
+                <div class="formRow">
+                    <label for="pass">Mot de passe :</label>
+                    <div class="loginInput"><input type="password" name="password" class="validate[required]" id="pass" /></div>
+                </div>
+                
+                <div class="loginControl">
+                    <div class="rememberMe"><input type="checkbox" id="remMe" name="remMe" /><label for="remMe">{{ trans('login') }}</label></div>
+                    <input type="submit" value="Log me in" class="dredB logMeIn" />
+                </div>
+            </fieldset>
+        </form>
+    </div>
+</div>    
+
+<!-- Footer line -->
+<div id="footer">
+    <div class="wrapper">NeuroSite CMS Powored by SDOKY SA <a href="https://www.neurosite.ch" title="">NeuroSite</a></div>
+</div>
+
+
+</body>
+</html>
