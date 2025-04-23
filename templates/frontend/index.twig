@@ -15,14 +15,14 @@
               </div>
             </div>
           <div class="container-fluid paddding">
-            
-            {% for article in articles %} 
+
+            {% for article in articles %}
             <div class="row pb-4">
               <div class="col-md-5">
                 <div class="fh5co_hover_news_img">
                   <div class="fh5co_news_img">
                     <img
-                      src="/assets/{{article.featured_image ? article.featured_image : '/default_images/default_image.png' }}"
+                      src="/assets/{{article.featured_image ? article.featured_image : 'frontend/default_images/default_image.png' }}"
                       alt="{{ article.title }}" />
                   </div>
                   <div></div>
@@ -30,7 +30,7 @@
               </div>
               <div class="col-md-7 animate-box">
                 <div>
-                  <a href="/article/{{article.slug}}" class="fh5co_magna py-2"> {{ article.title }} </a> 
+                  <a href="/article/{{article.slug}}" class="fh5co_magna py-2"> {{ article.title }} </a>
                 </div>
                 <div>
                   <a href="/article/{{article.slug}}" class="fh5co_mini_time py-3"> {{ article.publisher }} - <i class="fa fa-clock-o"></i> {{
@@ -83,11 +83,11 @@
             {% for article in articles %}
             <div class="row pb-3">
               <div class="col-5 align-self-center">
-                <img src="/assets/{{article.featured_image ? article.featured_image : '/default_images/default_image.png' }}" alt="{{ article.title }}" class="fh5co_most_trading" />
+                <img src="/assets/{{article.featured_image ? article.featured_image : 'frontend/default_images/default_image.png' }}" alt="{{ article.title }}" class="fh5co_most_trading" />
               </div>
               <div class="col-7 paddding">
-                <div class="most_fh5co_treding_font"> 
-                  <a href="/article/{{article.slug}}"> 
+                <div class="most_fh5co_treding_font">
+                  <a href="/article/{{article.slug}}">
                     {{ article.title }}
                   </a>
                 </div>
@@ -105,10 +105,10 @@
             {% for article in articles %}
             <div class="row pb-3">
               <div class="col-5 align-self-center">
-                <img src="/assets/{{article.featured_image ? article.featured_image : '/default_images/default_image.png' }}" alt="{{ article.title }}" class="fh5co_most_trading"  />
+                <img src="/assets/{{article.featured_image ? article.featured_image : 'frontend/default_images/default_image.png' }}" alt="{{ article.title }}" class="fh5co_most_trading"  />
               </div>
               <div class="col-7 paddding">
-                <div class="most_fh5co_treding_font"> <a href="/article/{{article.slug}}"> 
+                <div class="most_fh5co_treding_font"> <a href="/article/{{article.slug}}">
                   {{ article.title }}
                 </a></div>
                 <div class="most_fh5co_treding_font_123"> {{ article.publisher }} - <i class="fa fa-clock-o"></i> {{ article.publication_date|date("F j, Y") }}</div>

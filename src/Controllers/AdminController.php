@@ -311,7 +311,7 @@ class AdminController extends BaseController
 
       $slug = (new Slugify())->slugify($data['title']);
 
-      $this->articleModel->createPage($data['title'], $data['content'], $slug, $data['page_parent'] );
+      $this->pageModel->createPage($data['title'], $data['content'], $slug, $data['page_parent'] );
 
       $this->flash->addMessage('success', 'Page created successfully!');
 

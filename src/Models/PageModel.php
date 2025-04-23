@@ -20,36 +20,37 @@ class PageModel extends BaseModel {
         return $stmt->fetch() ?: null;
     }
     // Get a single page by its slug
-    public function getPageById(string $id): ?array
+    public function getPageById(int $id): ?array
     {
-      $stmt = $this->pdo->prepare("SELECT * FROM pages WHERE id = :id LIMIT 1");
+      $stmt = $this->pdo->prepare("SELECT * FROM pages WHERE id = ? LIMIT 1");
       $stmt->execute([$id]);
+
       return $stmt->fetch() ?: null;
     }
 
     // Create a new page
     public function createPage(string $title, string $content, string $slug, string $page_parent = null): bool
     {
-      $page_with_slug_exists = $this->getPageBySlug($slug);
+      $page_with_slug_exists = $this->getPageBySlugCount($slug);
 
       if($page_with_slug_exists) {
         $slug = $slug . '-' . time();
       }
 
-      $sql = "INSERT INTO pages (title, content, slug, page_parent_id) VALUES (?, ?, ?, ?)";
+      $sql = $page_parent > 0 ? "INSERT INTO pages (title, content, slug, page_parent_id) VALUES (?, ?, ?, ?)" : "INSERT INTO pages (title, content, slug) VALUES (?, ?, ?)";
 
-      return $this->execute($sql, [$title, $content, $slug, $page_parent]);
+      return $this->execute($sql, $page_parent > 0 ? [$title, $content, $slug, $page_parent] : [$title, $content, $slug]);
     }
 
   public function updatePage(int $id, string $title, string $content, string $slug, string $page_parent = null): bool {
-    $page_with_slug_exists = $this->getPageBySlug($slug);
+    $page_with_slug_exists = $this->getPageBySlugCount($slug);
 
     if($page_with_slug_exists) {
       $slug = $slug . '-' . time();
     }
 
-    $sql = "UPDATE pages SET title = ?, content = ?, slug = ?, page_parent = ? WHERE id = ?";
-    return $this->execute($sql, [$title, $content, $slug, $page_parent, $id]);
+    $sql = $page_parent > 0 ? "UPDATE pages SET title = ?, content = ?, slug = ?, page_parent_id = ? WHERE id = ?" : "UPDATE pages SET title = ?, content = ?, slug = ? WHERE id = ?";
+    return $this->execute($sql, $page_parent > 0 ? [$title, $content, $slug, $page_parent, $id] : [$title, $content, $slug, $id]);
   }
 
     // Update an existing page
@@ -80,9 +81,8 @@ class PageModel extends BaseModel {
     // Delete a page
     public function deletePage(int $id): bool
     {
-        $stmt = $this->pdo->prepare("DELETE FROM pages WHERE id = :id");
-        $stmt->bindParam(':id', $id, PDO::PARAM_INT);
-        return $stmt->execute();
+      $sql = "DELETE FROM pages WHERE id = ?";
+      return $this->execute($sql, [$id]);
     }
 
     public function getPaginatedPages(int $page, int $perPage): array {
@@ -100,4 +100,10 @@ class PageModel extends BaseModel {
       $stmt = $this->pdo->query($query); // Use $this->pdo for consistency
       return (int)$stmt->fetch(\PDO::FETCH_ASSOC)['total'];
     }
+
+  public function getPageBySlugCount(string $slug): ?array {
+    $stmt = $this->pdo->prepare("SELECT Count(*) as cnt FROM pages WHERE slug = ?");
+    $stmt->execute([$slug]);
+    return $stmt->fetch();
+  }
 }

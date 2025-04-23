@@ -37,7 +37,7 @@
                 <a href="/admin/page/edit/{{ page.id }}" class="edit-article-btn">Edit </a>
               </button>
 
-              <form action="/admin/article/delete/{{ page.id }}" method="POST" style="display: inline;">
+              <form action="/admin/page/delete/{{ page.id }}" method="POST" style="display: inline;">
                 <input type="hidden" name="{{ csrf.token_name_key }}" value="{{ csrf.token_name }}">
                 <input type="hidden" name="{{ csrf.token_value_key }}" value="{{ csrf.token_value }}">
                 <button type="submit" class="delete-article-btn" onclick="return confirm('Are you sure you want to delete this page?');">Delete</button>

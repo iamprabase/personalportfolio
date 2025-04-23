@@ -1,6 +1,6 @@
 {% extends 'admin/layout.twig' %}
 
-{% block title %}{{ article ? 'Edit' : 'New' }} Page {% endblock %}
+{% block title %}{{ page ? 'Edit' : 'New' }} Page {% endblock %}
 
 {% block content %}
     <!-- Main content wrapper -->
@@ -12,7 +12,7 @@
 {#            </div>#}
 
         <!-- Form -->
-        <form class="form" action="{{ page.id is defined ? ('/admin/page/edit/' ~ page.id) : ('/admin/page/create') }}" method="post" enctype="multipart/form-data">
+        <form class="form" action="{{ page.id is defined ? ('/admin/page/edit/' ~ page.id) : ('/admin/pages/create') }}" method="post" enctype="multipart/form-data">
 
             <input type="hidden" name="{{ csrf.token_name_key }}" value="{{ csrf.token_name }}">
             <input type="hidden" name="{{ csrf.token_value_key }}" value="{{ csrf.token_value }}">
@@ -20,18 +20,18 @@
             <fieldset>
                 <div class="widget">
                     <div class="title">
-                        <img src="/assets/backend/default_images/icons/dark/list.png" alt="" class="titleIcon"><h6>{{ article ? 'Edit' : 'New' }} Page </h6>
+                        <img src="/assets/backend/default_images/icons/dark/list.png" alt="" class="titleIcon"><h6>{{ page ? 'Edit' : 'New' }} Page </h6>
                     </div>
                     <div class="formRow">
                         <label>{{trans('post_title')}}</label>
                         <div class="formRight">
-                            <input type="text" name="title" id="title" value="{{ article.title | default('') }}" required>
+                            <input type="text" name="title" id="title" value="{{ page.title | default('') }}" required>
                         </div>
                     </div>
                     <div class="formRow">
                         <label for="labelFor">{{trans('post_description')}}</label>
                         <div class="formRight">
-                            <textarea name="content" id="content-editor">{{ article.content | default('') }}</textarea>
+                            <textarea name="content" id="content-editor">{{ page.content | default('') }}</textarea>
                         </div>
                     </div>
 
@@ -51,7 +51,7 @@
                         </div>
                     </div>
                     <div class="formRow">
-                    <button type="submit">{{ article ? 'Update' : 'Create' }} Article</button>
+                    <button type="submit">{{ page ? 'Update' : 'Create' }} Page</button>
                     </div>
 
                 </div>
@@ -74,7 +74,7 @@
           setup: function(editor) {
               // Set the content from the backend (Twig variable)
               editor.on('init', function() {
-                  editor.setContent(`{{ article.content | default('') | escape('js') }}`);
+                  editor.setContent(`{{ page.content | default('') | escape('js') }}`);
               });
           }
       });

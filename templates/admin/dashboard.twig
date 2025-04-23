@@ -27,7 +27,7 @@
               <td>{{user.email}}</td>
               <td>{{user.city}}</td>
               <td>{{user.country}}</td>
-              <td class="center" style="border-left-color: rgb(203, 203, 203);"><a href="{{user.profile_picture}}" title="" rel="lightbox"><img src="{{user.profile_picture}}" alt="" style="width: 50px;height: 50px;"></a></td>
+              <td class="center" style="border-left-color: rgb(203, 203, 203);"><a href="{{user.profile_picture ?? '/assets/frontend/default_images/default-avatar.png' }}" title="" rel="lightbox"><img src="{{user.profile_picture ?? '/assets/frontend/default_images/default-avatar.png'}}" alt="" style="width: 50px;height: 50px;"></a></td>
             </tr>
           {% endfor %}
         </tbody>
