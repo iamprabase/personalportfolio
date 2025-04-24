@@ -1,7 +1,7 @@
 <?php
 use Slim\App;
 
-use App\Controllers\ArticleController;
+use App\Controllers\HomeController;
 use App\Controllers\AuthController;
 use App\Controllers\CommentController;
 use App\Controllers\AdminController;
@@ -12,9 +12,9 @@ use App\Middleware\AuthMiddleware;
 
 return function (App $app) {
   // Home page: list articles
-  $app->get('/', [ArticleController::class, 'index']);
+  $app->get('/', [HomeController::class, 'index']);
   // Article detail page, using slug for clean URL
-  $app->get('/article/{slug}', [ArticleController::class, 'view']);
+  $app->get('/article/{slug}', [HomeController::class, 'view']);
 
   // Page Routes
   // $app->get('/pages', [PageController::class, 'index']);  // List all pages

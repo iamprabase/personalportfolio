@@ -28,7 +28,7 @@
   {% for comment in comments %}
   <div class="tm-comment tm-mb-45 d-flex align-items-start"  data-comment-id="{{ comment.id }}">
     <figure class="tm-comment-figure">
-      <img src="{{ comment.user_avatar|default('/assets/default_images/default-avatar.png') }}" alt="User Avatar" class="mb-2 rounded-circle img-thumbnail">
+      <img src="{{ comment.user_avatar|default('/assets/common/default_images/default-avatar.png') }}" alt="User Avatar" class="mb-2 rounded-circle img-thumbnail">
     </figure>
     <div class="tm-comment-content" >
       <figcaption class="tm-color-primary font-weight-bold">{{ comment.username }}</figcaption>

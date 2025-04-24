@@ -47,9 +47,10 @@ class UserModel extends BaseModel
     return $stmt->fetchAll(\PDO::FETCH_ASSOC);
   }
 
-  public function getTotalUsers(): int {
+  public function getTotalUsers(): int
+  {
     $query = "SELECT COUNT(*) as total FROM users";
     $stmt = $this->pdo->query($query); // Use $this->pdo for consistency
-    return (int)$stmt->fetch(\PDO::FETCH_ASSOC)['total'];
+    return (int) $stmt->fetch(\PDO::FETCH_ASSOC)['total'];
   }
 }

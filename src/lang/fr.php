@@ -74,7 +74,8 @@ return [
   'page_parent' => 'Page Parent',
 
 
-  'add_new_user' => 'Add New user',
+  'add_new_user' => 'List Users',
+  'comment_publisher' => 'Commented By',
   // 'featured_posts' => 'Featured Posts',
   // 'contact_us' => 'Contact Us',
 

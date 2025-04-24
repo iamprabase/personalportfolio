@@ -39,8 +39,8 @@ class AuthController extends BaseController
 
     // Define validation rules
     $rules = [
-      'username' => 'required|alpha_num|min:3|max:20',
-      'password' => 'required|min:8'
+      'username' => 'required',
+      'password' => 'required'
     ];
 
     // Validate input

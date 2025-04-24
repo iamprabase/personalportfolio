@@ -1,17 +1,70 @@
 
+-- Drop table and triggers if they already exist (optional, for re-runs)
+DROP TRIGGER IF EXISTS before_users_insert;
+DROP TRIGGER IF EXISTS before_users_update;
+DROP TABLE IF EXISTS users;
+
 -- Users table
 CREATE TABLE users (
     id INT AUTO_INCREMENT PRIMARY KEY,
+    title VARCHAR(50),
     is_admin TINYINT DEFAULT 0,
-    username VARCHAR(255) UNIQUE NOT NULL,
+    username VARCHAR(255) NOT NULL,
+    first_name VARCHAR(255),
     full_name VARCHAR(255) NOT NULL,
     city VARCHAR(255),
     country VARCHAR(255),
     password VARCHAR(255) NOT NULL,
-    email VARCHAR(255) UNIQUE NOT NULL,
+    email VARCHAR(255) NOT NULL,
+    profile_language VARCHAR(2) DEFAULT 'fr',
     registration_date DATETIME DEFAULT CURRENT_TIMESTAMP,
-    profile_picture VARCHAR(255)  -- URL or relative path to the profile_picture
+    profile_picture VARCHAR(255),
+    UNIQUE KEY unique_username (username),
+    UNIQUE KEY unique_email (email)
 );
+
+
+-- Add a trigger to enforce uniqueness for (username, email) when is_admin = 0
+DELIMITER //
+
+CREATE TRIGGER before_users_insert
+BEFORE INSERT ON users
+FOR EACH ROW
+BEGIN
+    IF NEW.is_admin = 0 THEN
+        IF EXISTS (
+            SELECT 1 FROM users
+            WHERE is_admin = 0
+              AND username = NEW.username
+              AND email = NEW.email
+        ) THEN
+            SIGNAL SQLSTATE '45000'
+            SET MESSAGE_TEXT = 'A non-admin user with this username and email already exists';
+        END IF;
+    END IF;
+END;
+//
+
+CREATE TRIGGER before_users_update
+BEFORE UPDATE ON users
+FOR EACH ROW
+BEGIN
+    IF NEW.is_admin = 0 THEN
+        IF EXISTS (
+            SELECT 1 FROM users
+            WHERE is_admin = 0
+              AND username = NEW.username
+              AND email = NEW.email
+              AND id <> NEW.id
+        ) THEN
+            SIGNAL SQLSTATE '45000'
+            SET MESSAGE_TEXT = 'A non-admin user with this username and email already exists';
+        END IF;
+    END IF;
+END;
+//
+
+DELIMITER ;
 
 -- Articles table
 CREATE TABLE articles (

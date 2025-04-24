@@ -8,7 +8,7 @@ use App\Models\CommentModel;
 use App\Models\LanguageModel;
 use Slim\Csrf\Guard;
 
-class ArticleController extends BaseController
+class HomeController extends BaseController
 {
   protected $articleModel;
   protected $commentModel;
@@ -38,22 +38,22 @@ class ArticleController extends BaseController
   // Home page: list all articles
   public function index(ServerRequestInterface $request, ResponseInterface $response): ResponseInterface
   {
-
-
-    if(isset($_SESSION['user']) && $_SESSION['user']['is_admin']) {
+    if (
+      isset($_SESSION['user']) &&
+      $_SESSION['user']['is_admin']
+    ) {
       return $response->withHeader('Location', '/admin')->withStatus(302);
     }
+    $this->addCsrfToView($request);
 
     $queryParams = $request->getQueryParams();
     $page = isset($queryParams['page']) ? (int) $queryParams['page'] : 1;
-    $perPage = 5; // Number of articles per page
+    $perPage = 5;
 
     $articles = $this->articleModel->getPaginatedArticles($page, $perPage);
     $totalArticles = $this->articleModel->getTotalArticles();
-
     $totalPages = ceil($totalArticles / $perPage);
 
-    $this->addCsrfToView($request);
     return $this->view->render($response, 'frontend/index.twig', [
       'articles' => $articles,
       'currentPage' => $page,

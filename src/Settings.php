@@ -30,7 +30,7 @@ return function ($container) {
   // Pass the db configuration array to your Database class.
   \App\Config\Database::setConfig($settings['db']);
   // Pass the configuration array to your Controller class.
-  \App\Controllers\ArticleController::setConfig($settings['author_meta_info']);
+  \App\Controllers\HomeController::setConfig($settings['author_meta_info']);
   // Pass the configuration array to your Controller class.
   \App\Controllers\AdminController::setConfig($settings['author_meta_info']);
 
@@ -47,8 +47,8 @@ return function ($container) {
   });
 
   // In your container configuration, set up the controller:
-  $container->set(\App\Controllers\ArticleController::class, function ($container) {
-    $controller = new \App\Controllers\ArticleController($container->get('csrf'));
+  $container->set(\App\Controllers\HomeController::class, function ($container) {
+    $controller = new \App\Controllers\HomeController($container->get('csrf'));
     $controller->setView($container->get('view'));  // 'view' is registered as Twig in the container.
     $controller->setFlash($container->get(Messages::class));
     return $controller;
