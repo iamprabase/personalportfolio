@@ -75,7 +75,7 @@
     <div class="loginLogo"><img src="/assets/backend/default_images/loginLogo.png" alt="" /></div>
     <div class="widget">
         <div class="title"><img src="/assets/backend/default_images/icons/dark/files.png" alt="" class="titleIcon" /><h6>Console d'administration</h6></div>
-        <form method="post" action="{{'/login'}}" id="validate" class="form">
+        <form method="post" action="{{'/admin/login'}}" id="validate" class="form">
           <input type="hidden" name="{{ csrf.token_name_key }}" value="{{ csrf.token_name }}">
           <input type="hidden" name="{{ csrf.token_value_key }}" value="{{ csrf.token_value }}">
             <fieldset>

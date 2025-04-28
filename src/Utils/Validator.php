@@ -1,93 +1,232 @@
-<?php 
-
+<?php
 namespace App\Utils;
 
-class Validator {
-    protected $errors = [];
-    protected $data = []; // Add a property to store the data being validated
+use Psr\Http\Message\UploadedFileInterface;
 
-    public function validate(array $data, array $rules): bool {
-        $this->data = $data; // Store the data for use in validation rules
+class Validator
+{
+  private array $errors = [];
+  private array $data = [];
+  private array $customMessages = [];
 
-        foreach ($rules as $field => $ruleSet) {
-            $value = $data[$field] ?? null;
-            foreach (explode('|', $ruleSet) as $rule) {
-                $this->applyRule($field, $value, $rule);
-            }
-        }
+  /**
+   * Validation rules with their corresponding methods
+   */
+  private const VALIDATION_RULES = [
+    'required' => 'validateRequired',
+    'email' => 'validateEmail',
+    'alpha_num' => 'validateAlphaNum',
+    'min' => 'validateMin',
+    'max' => 'validateMax',
+    'same' => 'validateSame',
+    'file' => 'validateFile',
+    'mimes' => 'validateMimes',
+    'size' => 'validateFileSize'
+  ];
 
-        return empty($this->errors);
+  /**
+   * Default error messages
+   */
+  private const DEFAULT_MESSAGES = [
+    'required' => 'This field is required.',
+    'email' => 'This field must be a valid email address.',
+    'alpha_num' => 'This field must contain only letters and numbers.',
+    'min' => 'This field must be at least :min characters.',
+    'max' => 'This field must not exceed :max characters.',
+    'same' => 'This field must match :other.',
+    'file' => 'File upload error.',
+    'mimes' => 'Invalid file type. Only :allowed are allowed.',
+    'size' => 'File size exceeds the maximum limit of :size.'
+  ];
+
+  /**
+   * Validate input data against rules
+   */
+  public function validate(array $data, array $rules, array $messages = []): bool
+  {
+    $this->data = $data;
+    $this->customMessages = $messages;
+    $this->errors = [];
+
+    foreach ($rules as $field => $ruleSet) {
+      $this->validateField($field, $ruleSet);
     }
 
-    public function applyRule(string $field, $value, string $rule): void {
-        // Handle file-specific validation
-        if ($value instanceof \Psr\Http\Message\UploadedFileInterface) {
-            if ($rule === 'file') {
-                if ($value->getError() !== UPLOAD_ERR_OK) {
-                    $this->addError($field, 'File upload error.');
-                }
-            }
+    return empty($this->errors);
+  }
 
-            if (str_starts_with($rule, 'mimes:')) {
-                $allowedMimes = explode(',', str_replace('mimes:', '', $rule));
-                
-                $uploadedMime = explode('image/', $value->getClientMediaType())[1];
+  /**
+   * Validate a single field
+   */
+  private function validateField(string $field, string $ruleSet): void
+  {
+    $value = $this->data[$field] ?? null;
+    $rules = explode('|', $ruleSet);
 
-                if (!in_array($uploadedMime, $allowedMimes)) {
-                    $this->addError($field, 'Invalid file type. Only png, jpg, jpeg are allowed with maximum upload size of 2MB.');
-                }
-            }
+    foreach ($rules as $rule) {
+      $this->processRule($field, $value, $rule);
+    }
+  }
 
-            if (str_starts_with($rule, 'max:')) {
-                $maxSize = (int) str_replace('max:', '', $rule) * 1024; // Convert KB to bytes
-                if ($value->getSize() > $maxSize) {
-                    $this->addError($field, 'File size exceeds the maximum limit.');
-                }
-            }
+  /**
+   * Process individual validation rule
+   */
+  private function processRule(string $field, $value, string $rule): void
+  {
+    $parameters = [];
 
-            return; // Skip further validation for file inputs
-        }
-
-        // Handle non-file validation rules
-        if ($rule === 'required' && (is_null($value) || $value === '')) {
-            $this->addError($field, 'This field is required.');
-        }
-
-        if ($rule === 'alpha_num' && !ctype_alnum($value)) {
-            $this->addError($field, 'This field must contain only letters and numbers.');
-        }
-
-        if (str_starts_with($rule, 'min:')) {
-            $min = (int) str_replace('min:', '', $rule);
-            if (strlen($value) < $min) {
-                $this->addError($field, "This field must be at least $min characters.");
-            }
-        }
-
-        if (str_starts_with($rule, 'max:')) {
-            $max = (int) str_replace('max:', '', $rule);
-            if (strlen($value) > $max) {
-                $this->addError($field, "This field must not exceed $max characters.");
-            }
-        }
-
-        if (str_starts_with($rule, 'same:')) {
-            $otherField = str_replace('same:', '', $rule);
-            if ($value !== ($this->data[$otherField] ?? null)) {
-                $this->addError($field, "This field must match $otherField.");
-            }
-        }
-
-        if ($rule === 'email' && !filter_var($value, FILTER_VALIDATE_EMAIL)) {
-            $this->addError($field, 'This field must be a valid email address.');
-        }
+    if (str_contains($rule, ':')) {
+      [$rule, $parameter] = explode(':', $rule, 2);
+      $parameters = explode(',', $parameter);
     }
 
-    public function getErrors(): array {
-        return $this->errors;
+    if (isset(self::VALIDATION_RULES[$rule])) {
+      $method = self::VALIDATION_RULES[$rule];
+      $this->$method($field, $value, $parameters);
+    }
+  }
+
+  /**
+   * Validate required fields
+   */
+  private function validateRequired(string $field, $value, array $parameters = []): void
+  {
+    if (is_null($value) || $value === '') {
+      $this->addError($field, 'required');
+    }
+  }
+
+  /**
+   * Validate email format
+   */
+  private function validateEmail(string $field, $value, array $parameters = []): void
+  {
+    if ($value && !filter_var($value, FILTER_VALIDATE_EMAIL)) {
+      $this->addError($field, 'email');
+    }
+  }
+
+  /**
+   * Validate alphanumeric input
+   */
+  private function validateAlphaNum(string $field, $value, array $parameters = []): void
+  {
+    if ($value && !ctype_alnum($value)) {
+      $this->addError($field, 'alpha_num');
+    }
+  }
+
+  /**
+   * Validate minimum length
+   */
+  private function validateMin(string $field, $value, array $parameters = []): void
+  {
+    $min = (int) ($parameters[0] ?? 0);
+    if ($value && strlen($value) < $min) {
+      $this->addError($field, 'min', ['min' => $min]);
+    }
+  }
+
+  /**
+   * Validate maximum length
+   */
+  private function validateMax(string $field, $value, array $parameters = []): void
+  {
+    $max = (int) ($parameters[0] ?? 0);
+    if ($value && strlen($value) > $max) {
+      $this->addError($field, 'max', ['max' => $max]);
+    }
+  }
+
+  /**
+   * Validate field matches another field
+   */
+  private function validateSame(string $field, $value, array $parameters = []): void
+  {
+    $otherField = $parameters[0] ?? '';
+    if ($value !== ($this->data[$otherField] ?? null)) {
+      $this->addError($field, 'same', ['other' => $otherField]);
+    }
+  }
+
+  /**
+   * Validate file upload
+   */
+  private function validateFile(string $field, $value, array $parameters = []): void
+  {
+    if ($value instanceof UploadedFileInterface && $value->getError() !== UPLOAD_ERR_OK) {
+      $this->addError($field, 'file');
+    }
+  }
+
+  /**
+   * Validate file mime types
+   */
+  private function validateMimes(string $field, $value, array $parameters = []): void
+  {
+    if ($value instanceof UploadedFileInterface) {
+      $mimeType = $value->getClientMediaType();
+      $allowedTypes = array_map(
+        fn($type) => 'image/' . $type,
+        $parameters
+      );
+
+      if (!in_array($mimeType, $allowedTypes)) {
+        $this->addError($field, 'mimes', ['allowed' => implode(', ', $parameters)]);
+      }
+    }
+  }
+
+  /**
+   * Validate file size
+   */
+  private function validateFileSize(string $field, $value, array $parameters = []): void
+  {
+    if ($value instanceof UploadedFileInterface) {
+      $maxSize = (int) ($parameters[0] ?? 0) * 1024; // Convert KB to bytes
+      if ($value->getSize() > $maxSize) {
+        $this->addError($field, 'size', ['size' => $parameters[0] . 'KB']);
+      }
+    }
+  }
+
+  /**
+   * Add validation error
+   */
+  private function addError(string $field, string $rule, array $parameters = []): void
+  {
+    $message = $this->customMessages["$field.$rule"]
+      ?? $this->customMessages[$rule]
+      ?? self::DEFAULT_MESSAGES[$rule];
+
+    foreach ($parameters as $key => $value) {
+      $message = str_replace(":$key", $value, $message);
     }
 
-    protected function addError(string $field, string $message): void {
-        $this->errors[$field][] = $message;
-    }
+    $this->errors[$field][] = $message;
+  }
+
+  /**
+   * Get validation errors
+   */
+  public function getErrors(): array
+  {
+    return $this->errors;
+  }
+
+  /**
+   * Check if field has errors
+   */
+  public function hasError(string $field): bool
+  {
+    return isset($this->errors[$field]);
+  }
+
+  /**
+   * Get first error for field
+   */
+  public function getFirstError(string $field): ?string
+  {
+    return $this->errors[$field][0] ?? null;
+  }
 }

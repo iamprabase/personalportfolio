@@ -29,7 +29,7 @@ $container = new Container();
 // Add Twig to container
 $container->set('view', function () {
   $twig = Twig::create(__DIR__ . '/../templates', [
-    'cache' => FALSE, // or provide a cache dir in production
+    'cache' => FALSE,
   ]);
 
   // Register Translation function
@@ -64,11 +64,16 @@ $container->set('view', function () {
 });
 
 AppFactory::setContainer($container);
+
 $app = AppFactory::create();
 // Add error middleware
-$errorMiddleware = $app->addErrorMiddleware($_ENV['DISPLAY_ERROR'], $_ENV['LOG_ERROR'], $_ENV['LOG_ERROR_DETAILS']); // For development: show detailed errors
-$responseFactory = $app->getResponseFactory();
+$errorMiddleware = $app->addErrorMiddleware(
+  $_ENV['DISPLAY_ERROR'],
+  $_ENV['LOG_ERROR'],
+  $_ENV['LOG_ERROR_DETAILS']
+); // For development: show detailed errors
 
+$responseFactory = $app->getResponseFactory();
 // Register Middleware On Container
 $container->set('csrf', function () use ($responseFactory) {
 
@@ -84,7 +89,6 @@ $container->set('csrf', function () use ($responseFactory) {
     true
   );
 });
-
 // Register Middleware To Be Executed On All Routes
 $app->add('csrf');
 
@@ -93,6 +97,7 @@ $app->add('csrf');
 
 // Register Twig Middleware
 $app->add(TwigMiddleware::createFromContainer($app));
+// Register Language Middleware
 $app->add(\App\Middleware\LanguageMiddleware::class);
 
 // Use custom error handler

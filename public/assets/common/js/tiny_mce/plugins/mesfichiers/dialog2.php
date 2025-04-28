@@ -1,0 +1,101 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+	<title>Gestionnaire de fichiers PDF</title>
+	<script type="text/javascript" src="../../tiny_mce_popup.js"></script>
+	<script type="text/javascript" src="js/dialog.js"></script>
+   <script type="text/javascript" src="js/delete.js"></script>
+	
+
+
+	
+
+</head>
+<body>
+
+<script language="javascript">
+// fonction pour le cas d'appui sur la touche entrée
+function testsubmit() {
+    return !!document.formulaire.action;
+}
+
+
+
+function afficher()
+{
+
+}
+
+	</script>
+	
+<br />
+<br />
+Le gestionnaire des fichiers PDF est en cours de d&eacute;veloppement et sera int&eacute;gr&eacute; dans la nouvelle version de l'application 
+<form action="#" name="formulaire" id="formulaire" method="post" onsubmit="testsubmit();">
+
+<p>
+Selection le fichier : <br />
+
+<?php
+$mysqlDB_link = mysql_connect("localhost", "root", "");
+mysql_select_db("essaidb", $mysqlDB_link);
+if (!$mysqlDB_link) 
+{
+exit("Échec de la connexion ");
+}
+
+$sql = "SELECT * FROM texte ORDER BY IDT DESC";
+$req = mysql_query($sql);
+$varDonnee .= 'Liste des données<br>'; 
+
+while ($ligne = mysql_fetch_assoc($req))
+{
+$IDT = $ligne['IDT'];
+$titre = $ligne['titre'];
+$link = 'http://www.sanslactose.com/'.$ligne['link'].'.php';
+// affiche le resultat
+$varDonnee .='<input name="someval" type="radio" id="someval" value="'.$link.'" />'.$titre.'<br />';
+}
+
+
+
+$varDonnee .= '</form>';
+
+echo $varDonnee;
+?>
+
+<?php
+if(isset($_POST['afficher']))
+{
+echo '<br><br>'.$_POST['afficher'];
+}
+elseif(isset($_POST['supprimer']))
+{
+echo '<br><br>'.$_POST['supprimer'];
+}
+
+?>
+
+<br /> 
+</p>
+
+
+
+	<div class="mceActionPanel">
+		<div style="float: left">
+<input type="button"  name="insert" value="{#insert}" onclick="MesfichiersDialog.insert();" />
+			<br>
+		<input type="submit" name="afficher" value="afficher donnée"  />
+			<br>
+			<input type="submit"  name="supprimer" value="supprimer donnée"  />
+		</div>
+
+		<div style="float: right"></div>
+	</div>
+</form>
+<br>
+
+</body>
+</html>

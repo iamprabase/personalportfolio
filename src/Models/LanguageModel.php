@@ -1,16 +1,14 @@
 <?php
 namespace App\Models;
 
-class LanguageModel  extends BaseModel {
-    
-    public function getAllLanguages(): array {
-        // // Return a predefined list of languages
-        return [
-            ['code' => 'en', 'name' => 'English'],
-            ['code' => 'fr', 'name' => 'French'],
-        ];
+class LanguageModel extends BaseModel
+{
 
-        // $stmt = $this->pdo->query("SELECT * FROM languages");
-        // return $stmt->fetchAll();
-    }
+  public function getAllLanguages(): array
+  {
+    return [
+      ['code' => 'en', 'name' => 'English'],
+      ['code' => 'fr', 'name' => 'French'],
+    ];
+  }
 }

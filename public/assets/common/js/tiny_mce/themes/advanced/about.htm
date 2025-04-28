@@ -1,0 +1,44 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"> 
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+	<title>{#advanced_dlg.about_title}</title>
+	<script type="text/javascript" src="../../tiny_mce_popup.js"></script>
+	<script type="text/javascript" src="../../utils/mctabs.js"></script>
+	<script type="text/javascript" src="js/about.js"></script>
+</head>
+<body id="about" style="display: none">
+<div class="tabs"></div>
+
+		<div class="panel_wrapper">
+			<div id="general_panel" class="panel current">
+				<h3>{#advanced_dlg.about_title}</h3>
+				<p>Nos explications. </p>
+				<div id="buttoncontainer">
+					<a href="http://www.moxiecode.com" target="_blank"></a>
+					<a href="http://sourceforge.net/projects/tinymce/" target="_blank"></a>
+					<a href="http://www.freshmeat.net/projects/tinymce" target="_blank"></a>				</div>
+			</div>
+
+			<div id="plugins_panel" class="panel">
+				<div id="pluginscontainer">
+					<h3>{#advanced_dlg.about_loaded}</h3>
+
+					<div id="plugintablecontainer">
+					</div>
+
+					<p>&nbsp;</p>
+				</div>
+			</div>
+
+			<div id="help_panel" class="panel noscroll" style="overflow: visible;">
+				<div id="iframecontainer"></div>
+			</div>
+		</div>
+
+		<div class="mceActionPanel">
+			<div style="float: right">
+				<input type="button" id="cancel" name="cancel" value="{#close}" onclick="tinyMCEPopup.close();" />
+			</div>
+		</div>
+</body>
+</html>

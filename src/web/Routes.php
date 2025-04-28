@@ -6,6 +6,7 @@ use App\Controllers\AuthController;
 use App\Controllers\CommentController;
 use App\Controllers\AdminController;
 use App\Controllers\PageController;
+use App\Controllers\ImageController;
 
 use App\Middleware\AdminMiddleware;
 use App\Middleware\AuthMiddleware;
@@ -64,6 +65,7 @@ return function (App $app) {
     $group->post('/login', [AuthController::class, 'adminLogin']);
     $group->get('/register', [AuthController::class, 'showAdminRegister']);
     $group->post('/register', [AuthController::class, 'adminRegister']);
+    $group->get('/get-images', [ImageController::class, 'index']);
   });
 
   // Admin Routes (protected by AdminMiddleware)
@@ -86,3 +88,16 @@ return function (App $app) {
   })->add(new AdminMiddleware());
 
 };
+
+
+// <?php
+// namespace App\Routes;
+
+// use Slim\App;
+// use App\Utils\RouteManager;
+
+// // Usage
+// return function (App $app) {
+//   $routeManager = new RouteManager($app);
+//   $routeManager->registerRoutes();
+// };

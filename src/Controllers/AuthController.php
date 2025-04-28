@@ -57,6 +57,7 @@ class AuthController extends BaseController
 
     // Retrieve user by username
     $user = $this->userModel->getUserByUsername($data['username']);
+
     if (!$user || !password_verify($data['password'], $user['password'])) {
 
       $this->addCsrfToView($request);
@@ -105,7 +106,7 @@ class AuthController extends BaseController
     }
 
     // Retrieve user by username
-    $user = $this->userModel->getUserByUsername($data['username']);
+    $user = $this->userModel->getUserByUsername($data['username'], 1);
     if (!$user || !password_verify($data['password'], $user['password'])) {
 
       $this->addCsrfToView($request);

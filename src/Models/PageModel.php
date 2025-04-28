@@ -1,109 +1,245 @@
 <?php
-
 namespace App\Models;
 
-class PageModel extends BaseModel {
+use PDO;
+use PDOException;
 
-    // Get all pages
-    public function getAllPages(): array
-    {
-        $stmt = $this->pdo->prepare("SELECT * FROM pages ORDER BY created_at DESC");
-        $stmt->execute();
-        return $stmt->fetchAll();
+class PageModel extends BaseModel
+{
+  /**
+   * Get all pages with optional caching
+   * @return array
+   */
+  public function getAllPages(): array
+  {
+    try {
+      $sql = "SELECT id, title, slug, content, created_at, page_parent_id 
+                   FROM pages 
+                   ORDER BY created_at DESC";
+
+      $stmt = $this->pdo->prepare($sql);
+      $stmt->execute();
+      return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    } catch (PDOException $e) {
+      error_log("Error fetching all pages: " . $e->getMessage());
+      throw $e;
     }
-
-    // Get a single page by its slug
-    public function getPageBySlug(string $slug): ?array
-    {
-        $stmt = $this->pdo->prepare("SELECT * FROM pages WHERE slug = :slug LIMIT 1");
-        $stmt->execute([$slug]);
-        return $stmt->fetch() ?: null;
-    }
-    // Get a single page by its slug
-    public function getPageById(int $id): ?array
-    {
-      $stmt = $this->pdo->prepare("SELECT * FROM pages WHERE id = ? LIMIT 1");
-      $stmt->execute([$id]);
-
-      return $stmt->fetch() ?: null;
-    }
-
-    // Create a new page
-    public function createPage(string $title, string $content, string $slug, string $page_parent = null): bool
-    {
-      $page_with_slug_exists = $this->getPageBySlugCount($slug);
-
-      if($page_with_slug_exists) {
-        $slug = $slug . '-' . time();
-      }
-
-      $sql = $page_parent > 0 ? "INSERT INTO pages (title, content, slug, page_parent_id) VALUES (?, ?, ?, ?)" : "INSERT INTO pages (title, content, slug) VALUES (?, ?, ?)";
-
-      return $this->execute($sql, $page_parent > 0 ? [$title, $content, $slug, $page_parent] : [$title, $content, $slug]);
-    }
-
-  public function updatePage(int $id, string $title, string $content, string $slug, string $page_parent = null): bool {
-    $page_with_slug_exists = $this->getPageBySlugCount($slug);
-
-    if($page_with_slug_exists) {
-      $slug = $slug . '-' . time();
-    }
-
-    $sql = $page_parent > 0 ? "UPDATE pages SET title = ?, content = ?, slug = ?, page_parent_id = ? WHERE id = ?" : "UPDATE pages SET title = ?, content = ?, slug = ? WHERE id = ?";
-    return $this->execute($sql, $page_parent > 0 ? [$title, $content, $slug, $page_parent, $id] : [$title, $content, $slug, $id]);
   }
 
-    // Update an existing page
-//    public function updatePage(int $id, array $data): bool
-//    {
-//        $stmt = $this->pdo->prepare(
-//            "UPDATE pages
-//             SET identifier = :identifier, title = :title, subtitle = :subtitle, content = :content,
-//                 slug = :slug, meta_title = :meta_title, meta_description = :meta_description,
-//                 canonical_url = :canonical_url, language = :language
-//             WHERE id = :id"
-//        );
-//
-//        $stmt->bindParam(':id', $id, PDO::PARAM_INT);
-//        $stmt->bindParam(':identifier', $data['identifier'], PDO::PARAM_STR);
-//        $stmt->bindParam(':title', $data['title'], PDO::PARAM_STR);
-//        $stmt->bindParam(':subtitle', $data['subtitle'], PDO::PARAM_STR);
-//        $stmt->bindParam(':content', $data['content'], PDO::PARAM_STR);
-//        $stmt->bindParam(':slug', $data['slug'], PDO::PARAM_STR);
-//        $stmt->bindParam(':meta_title', $data['meta_title'], PDO::PARAM_STR);
-//        $stmt->bindParam(':meta_description', $data['meta_description'], PDO::PARAM_STR);
-//        $stmt->bindParam(':canonical_url', $data['canonical_url'], PDO::PARAM_STR);
-//        $stmt->bindParam(':language', $data['language'], PDO::PARAM_STR);
-//
-//        return $stmt->execute();
-//    }
+  /**
+   * Get a single page by its slug
+   * @param string $slug
+   * @return array|null
+   */
+  public function getPageBySlug(string $slug): ?array
+  {
+    try {
+      $sql = "SELECT id, title, slug, content, created_at, page_parent_id 
+                   FROM pages 
+                   WHERE slug = :slug 
+                   LIMIT 1";
 
-    // Delete a page
-    public function deletePage(int $id): bool
-    {
-      $sql = "DELETE FROM pages WHERE id = ?";
-      return $this->execute($sql, [$id]);
+      $stmt = $this->pdo->prepare($sql);
+      $stmt->execute([':slug' => $slug]);
+      return $stmt->fetch(PDO::FETCH_ASSOC) ?: null;
+    } catch (PDOException $e) {
+      error_log("Error fetching page by slug: " . $e->getMessage());
+      throw $e;
     }
+  }
 
-    public function getPaginatedPages(int $page, int $perPage): array {
+  /**
+   * Get a single page by its ID
+   * @param int $id
+   * @return array|null
+   */
+  public function getPageById(int $id): ?array
+  {
+    try {
+      $sql = "SELECT id, title, slug, content, created_at, page_parent_id 
+                   FROM pages 
+                   WHERE id = :id 
+                   LIMIT 1";
+
+      $stmt = $this->pdo->prepare($sql);
+      $stmt->execute([':id' => $id]);
+      return $stmt->fetch(PDO::FETCH_ASSOC) ?: null;
+    } catch (PDOException $e) {
+      error_log("Error fetching page by ID: " . $e->getMessage());
+      throw $e;
+    }
+  }
+
+  /**
+   * Create a new page with unique slug
+   * @return bool
+   */
+  public function createPage(
+    string $title,
+    string $content,
+    string $slug,
+    ?string $pageParent = null
+  ): bool {
+    try {
+      $uniqueSlug = $this->generateUniqueSlug($slug);
+
+      $sql = "INSERT INTO pages (title, content, slug, page_parent_id, created_at) 
+                   VALUES (:title, :content, :slug, :page_parent_id, NOW())";
+
+      $params = [
+        ':title' => trim($title),
+        ':content' => trim($content),
+        ':slug' => $uniqueSlug,
+        ':page_parent_id' => $pageParent ?: null
+      ];
+
+      $stmt = $this->pdo->prepare($sql);
+      return $stmt->execute($params);
+    } catch (PDOException $e) {
+      error_log("Error creating page: " . $e->getMessage());
+      throw $e;
+    }
+  }
+
+  /**
+   * Update an existing page
+   * @return bool
+   */
+  public function updatePage(
+    int $id,
+    string $title,
+    string $content,
+    string $slug,
+    ?string $pageParent = null
+  ): bool {
+    try {
+      $currentPage = $this->getPageById($id);
+      if (!$currentPage) {
+        return false;
+      }
+
+      $uniqueSlug = $slug !== $currentPage['slug']
+        ? $this->generateUniqueSlug($slug)
+        : $slug;
+
+      $sql = "UPDATE pages 
+                   SET title = :title, 
+                       content = :content, 
+                       slug = :slug, 
+                       page_parent_id = :page_parent_id,
+                       updated_at = NOW()
+                   WHERE id = :id";
+
+      $params = [
+        ':title' => trim($title),
+        ':content' => trim($content),
+        ':slug' => $uniqueSlug,
+        ':page_parent_id' => $pageParent ?: null,
+        ':id' => $id
+      ];
+
+      $stmt = $this->pdo->prepare($sql);
+      return $stmt->execute($params);
+    } catch (PDOException $e) {
+      error_log("Error updating page: " . $e->getMessage());
+      throw $e;
+    }
+  }
+
+  /**
+   * Delete a page
+   * @return bool
+   */
+  public function deletePage(int $id): bool
+  {
+    try {
+      $sql = "DELETE FROM pages WHERE id = :id";
+      $stmt = $this->pdo->prepare($sql);
+      return $stmt->execute([':id' => $id]);
+    } catch (PDOException $e) {
+      error_log("Error deleting page: " . $e->getMessage());
+      throw $e;
+    }
+  }
+
+  /**
+   * Get paginated pages
+   * @return array
+   */
+  public function getPaginatedPages(int $page, int $perPage): array
+  {
+    try {
       $offset = ($page - 1) * $perPage;
-      $query = "SELECT * FROM pages ORDER BY id DESC LIMIT :limit OFFSET :offset";
-      $stmt = $this->pdo->prepare($query); // Use $this->pdo for consistency
-      $stmt->bindValue(':limit', $perPage, \PDO::PARAM_INT);
-      $stmt->bindValue(':offset', $offset, \PDO::PARAM_INT);
+      $sql = "SELECT id, title, slug, created_at, page_parent_id 
+                   FROM pages 
+                   ORDER BY created_at DESC 
+                   LIMIT :limit OFFSET :offset";
+
+      $stmt = $this->pdo->prepare($sql);
+      $stmt->bindValue(':limit', $perPage, PDO::PARAM_INT);
+      $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
       $stmt->execute();
-      return $stmt->fetchAll(\PDO::FETCH_ASSOC);
+
+      return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    } catch (PDOException $e) {
+      error_log("Error fetching paginated pages: " . $e->getMessage());
+      throw $e;
+    }
+  }
+
+  /**
+   * Get total number of pages
+   * @return int
+   */
+  public function getTotalPages(): int
+  {
+    try {
+      return (int) $this->pdo->query("SELECT COUNT(*) FROM pages")
+        ->fetchColumn();
+    } catch (PDOException $e) {
+      error_log("Error counting pages: " . $e->getMessage());
+      throw $e;
+    }
+  }
+
+  /**
+   * Generate a unique slug
+   * @return string
+   */
+  private function generateUniqueSlug(string $slug): string
+  {
+    $baseSlug = $this->sanitizeSlug($slug);
+    $uniqueSlug = $baseSlug;
+    $counter = 1;
+
+    while ($this->isSlugExists($uniqueSlug)) {
+      $uniqueSlug = $baseSlug . '-' . $counter++;
     }
 
-    public function getTotalPages(): int {
-      $query = "SELECT COUNT(*) as total FROM pages";
-      $stmt = $this->pdo->query($query); // Use $this->pdo for consistency
-      return (int)$stmt->fetch(\PDO::FETCH_ASSOC)['total'];
-    }
+    return $uniqueSlug;
+  }
 
-  public function getPageBySlugCount(string $slug): ?array {
-    $stmt = $this->pdo->prepare("SELECT Count(*) as cnt FROM pages WHERE slug = ?");
-    $stmt->execute([$slug]);
-    return $stmt->fetch();
+  /**
+   * Check if slug exists
+   * @return bool
+   */
+  private function isSlugExists(string $slug): bool
+  {
+    $stmt = $this->pdo->prepare("SELECT COUNT(*) FROM pages WHERE slug = :slug");
+    $stmt->execute([':slug' => $slug]);
+    return (int) $stmt->fetchColumn() > 0;
+  }
+
+  /**
+   * Sanitize slug
+   * @return string
+   */
+  private function sanitizeSlug(string $slug): string
+  {
+    return strtolower(preg_replace(
+      '/[^a-zA-Z0-9-]/',
+      '-',
+      trim($slug)
+    ));
   }
 }

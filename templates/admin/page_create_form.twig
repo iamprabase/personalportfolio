@@ -68,9 +68,74 @@
   window.onload = function() {
       tinymce.init({
           selector: '#content-editor', // The textarea you want to turn into TinyMCE
-          plugins: 'advlist autolink lists link image charmap print preview',
-          toolbar: 'undo redo | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist | link image',
-          menubar: false,
+          plugins: [
+						'advlist', 'autolink', 'lists', 'link', 'image', 'charmap', 'preview',
+						'anchor', 'searchreplace', 'visualblocks', 'code', 'fullscreen',
+						'insertdatetime', 'media', 'table', 'help', 'wordcount', 'directionality',
+						'noneditable', 'visualchars', 'paste', 'contextmenu'
+
+					],
+					// Alternative simplified version
+					toolbar: 'formatselect | table | fontfamily fontsizeinput | \
+									pastetext | bold italic underline | \
+									alignleft aligncenter alignright alignjustify | \
+									forecolor bullist numlist indent outdent | \
+									charmap link unlink anchor image | \
+									undo redo removeformat searchreplace code preview help',
+					// Add font_formats to customize available fonts
+					font_formats: 'Arial=arial,helvetica,sans-serif;' +
+             'Arial Black=arial black,avant garde;' +
+             'Book Antiqua=book antiqua,palatino;' +
+             'Comic Sans MS=comic sans ms,sans-serif;' +
+             'Courier New=courier new,courier;' +
+             'Georgia=georgia,palatino;' +
+             'Helvetica=helvetica;' +
+             'Impact=impact,chicago;' +
+             'Symbol=symbol;' +
+             'Tahoma=tahoma,arial,helvetica,sans-serif;' +
+             'Terminal=terminal,monaco;' +
+             'Times New Roman=times new roman,times;' +
+             'Trebuchet MS=trebuchet ms,geneva;' +
+             'Verdana=verdana,geneva;' +
+             'Webdings=webdings;' +
+             'Wingdings=wingdings,zapf dingbats',
+						 // Custom file browser setup
+    file_picker_callback: function(callback, value, meta) {
+        if (meta.filetype === 'image') {
+            // Open custom file browser
+            openImageBrowser(callback);
+        }
+    },
+		 // Other configurations...
+    image_dimensions: false,
+    image_class_list: [
+        {title: 'Responsive', value: 'img-fluid'}
+    ],
+						 // Configure available formats in the format selector
+					formats: {
+							// Headings
+							h1: { block: 'h1' },
+							h2: { block: 'h2' },
+							h3: { block: 'h3' },
+							h4: { block: 'h4' },
+							h5: { block: 'h5' },
+							h6: { block: 'h6' },
+							// Blocks
+							paragraph: { block: 'p' },
+							div: { block: 'div' },
+							// Other formats as needed
+					},
+
+					// Configure which formats appear in the format dropdown
+					block_formats: 'Paragraph=p; Heading 1=h1; Heading 2=h2; Heading 3=h3; Heading 4=h4; Heading 5=h5; Heading 6=h6',
+
+					// Add fontsize_formats to customize available font sizes
+					fontsize_formats: '8pt 10pt 12pt 14pt 16pt 18pt 24pt 36pt 48pt',
+					height: 400,
+					menubar: true,
+					statusbar: true,
+					branding: false,
+					promotion: false,
           setup: function(editor) {
               // Set the content from the backend (Twig variable)
               editor.on('init', function() {
@@ -79,6 +144,106 @@
           }
       });
   };
+
+// Custom image browser function
+function openImageBrowser(callback) {
+    var modal = document.createElement('div');
+    modal.className = 'image-browser-modal';
+    modal.innerHTML = `
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Select Image</h3>
+                <button class="close-btn">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="image-grid" id="imageGrid"></div>
+            </div>
+        </div>
+    `;
+
+    // Add styles
+    var style = document.createElement('style');
+    style.textContent = `
+        .image-browser-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .modal-content {
+            background: white;
+            padding: 20px;
+            border-radius: 4px;
+            width: 80%;
+            max-width: 800px;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+        }
+        .image-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 15px;
+            padding: 15px;
+        }
+        .image-item {
+            cursor: pointer;
+            border: 2px solid transparent;
+            padding: 5px;
+            transition: all 0.3s;
+        }
+        .image-item:hover {
+            border-color: #4CAF50;
+        }
+        .image-item img {
+            width: 100%;
+            height: 150px;
+            object-fit: cover;
+        }
+    `;
+
+    document.head.appendChild(style);
+    document.body.appendChild(modal);
+
+    // Load images from server
+    fetch('/admin/get-images')  // Create this endpoint in your backend
+        .then(response => response.json())
+        .then(images => {
+            const imageGrid = document.getElementById('imageGrid');
+            images.forEach(image => {
+                const div = document.createElement('div');
+                div.className = 'image-item';
+                div.innerHTML = `<img src="${image.url}" alt="${image.name}">`;
+                div.onclick = () => {
+                    callback(image.url);
+                    document.body.removeChild(modal);
+                };
+                imageGrid.appendChild(div);
+            });
+        });
+
+    // Close modal handler
+    modal.querySelector('.close-btn').onclick = () => {
+        document.body.removeChild(modal);
+    };
+}
 </script>
 
 {% endblock %}
