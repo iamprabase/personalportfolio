@@ -5,15 +5,12 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use App\Models\ArticleModel;
 use App\Models\CommentModel;
-use App\Models\LanguageModel;
 use Slim\Csrf\Guard;
 
 class HomeController extends BaseController
 {
   protected $articleModel;
   protected $commentModel;
-  protected $languageModel;
-
   private static $config = null; // Holds the configuration
 
   public function __construct(Guard $csrf)
@@ -22,7 +19,6 @@ class HomeController extends BaseController
 
     $this->articleModel = new ArticleModel();
     $this->commentModel = new CommentModel();
-    $this->languageModel = new LanguageModel();
   }
 
   /**
@@ -64,11 +60,14 @@ class HomeController extends BaseController
   // View a single article by its slug
   public function view(ServerRequestInterface $request, ResponseInterface $response, array $args): ResponseInterface
   {
+    $this->addCsrfToView($request);
+
     $slug = $args['slug'];
     $article = $this->articleModel->getArticleBySlug($slug);
 
     if (!$article) {
       $response->getBody()->write("Article not found");
+
       return $response->withStatus(404);
     }
     $comments = $this->commentModel->getCommentsByArticleId($article['id']);
@@ -76,7 +75,6 @@ class HomeController extends BaseController
     $current_user_id = isset($_SESSION['user']) ? $_SESSION['user']['id'] : null;
     $is_admin = isset($_SESSION['user']) && isset($_SESSION['user']['is_admin']) ? $_SESSION['user']['is_admin'] : false;
 
-    $this->addCsrfToView($request); // Use the method from BaseController
     return $this->view->render($response, 'frontend/article.twig', [
       'article' => $article,
       'comments' => $comments,

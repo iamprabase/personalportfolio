@@ -23,19 +23,15 @@ class AuthController extends BaseController
   {
     $this->addCsrfToView($request);
 
-    return $this->view->render($response, 'frontend/index.twig');
-  }
+    $template = $request->getServerParams()["REQUEST_URI"] == '/admin/login' ? 'auth/backend_login.twig' : 'frontend/index.twig';
 
-  public function showAdminLogin(ServerRequestInterface $request, ResponseInterface $response): ResponseInterface
-  {
-    $this->addCsrfToView($request);
-
-    return $this->view->render($response, 'auth/backend_login.twig');
+    return $this->view->render($response, $template);
   }
 
   public function login(ServerRequestInterface $request, ResponseInterface $response): ResponseInterface
   {
     $data = $request->getParsedBody();
+    $template = $request->getServerParams()["REQUEST_URI"] == '/admin/login' ? 'auth/backend_login.twig' : 'frontend/index.twig';
 
     // Define validation rules
     $rules = [
@@ -49,57 +45,8 @@ class AuthController extends BaseController
       $errors = $validator->getErrors();
 
       $this->addCsrfToView($request);
-      return $this->view->render($response, 'frontend/index.twig', [
-        'errors' => $errors,
-        'data' => $data // Pass back the input data to pre-fill the form
-      ]);
-    }
 
-    // Retrieve user by username
-    $user = $this->userModel->getUserByUsername($data['username']);
-
-    if (!$user || !password_verify($data['password'], $user['password'])) {
-
-      $this->addCsrfToView($request);
-      return $this->view->render($response, 'frontend/index.twig', [
-        'errors' => ['general' => ['Invalid username or password.']],
-        'data' => $data
-      ]);
-    }
-
-    // On successful login, store user info in session
-    $_SESSION['user'] = [
-      'id' => $user['id'],
-      'username' => $user['username'],
-      'email' => $user['email'],
-      'is_admin' => (bool) $user['is_admin']
-    ];
-
-    $is_admin = $_SESSION['user']['is_admin'];
-
-    $this->flash->addMessage('success', 'Login successful!');
-    // Redirect to home or profile
-    return $response->withHeader('Location', $is_admin ? '/admin' : '/admin')->withStatus(302);
-  }
-
-  public function adminLogin(ServerRequestInterface $request, ResponseInterface $response): ResponseInterface
-  {
-    $data = $request->getParsedBody();
-
-    // Define validation rules
-    $rules = [
-      'username' => 'required|alpha_num|min:3|max:20',
-      'password' => 'required|min:8'
-    ];
-
-    // Validate input
-    $validator = new Validator();
-    if (!$validator->validate($data, $rules)) {
-      $errors = $validator->getErrors();
-
-      $this->addCsrfToView($request);
-
-      return $this->view->render($response, 'auth/backend_login.twig', [
+      return $this->view->render($response, $template, [
         'errors' => $errors,
         'data' => $data // Pass back the input data to pre-fill the form
       ]);
@@ -111,37 +58,30 @@ class AuthController extends BaseController
 
       $this->addCsrfToView($request);
 
-      return $this->view->render($response, 'auth/backend_login.twig', [
+      return $this->view->render($response, $template, [
         'errors' => ['general' => ['Invalid username or password.']],
         'data' => $data
       ]);
     }
 
+    $is_admin = (bool) $user['is_admin'];
     // On successful login, store user info in session
     $_SESSION['user'] = [
       'id' => $user['id'],
       'username' => $user['username'],
       'email' => $user['email'],
-      'is_admin' => (bool) $user['is_admin']
+      'is_admin' => $is_admin
     ];
 
-    $is_admin = $_SESSION['user']['is_admin'];
+    $this->flash->addMessage('success', 'login_successfully');
 
-    $this->flash->addMessage('success', 'Login successful!');
+    $redirection_route = $is_admin ? '/admin' : '/';
 
     // Redirect to home or profile
-    return $response->withHeader('Location', $is_admin ? '/admin' : '/')->withStatus(302);
+    return $response->withHeader('Location', $redirection_route)->withStatus(302);
   }
 
   public function showRegister(ServerRequestInterface $request, ResponseInterface $response): ResponseInterface
-  {
-
-    $this->addCsrfToView($request);
-
-    return $this->view->render($response, 'auth/register.twig');
-  }
-
-  public function showAdminRegister(ServerRequestInterface $request, ResponseInterface $response): ResponseInterface
   {
 
     $this->addCsrfToView($request);
@@ -201,6 +141,7 @@ class AuthController extends BaseController
     // Check if user already exists
     if ($this->userModel->getUserByUsername($data['username'])) {
       $this->addCsrfToView($request);
+
       return $this->view->render($response, 'auth/register.twig', [
         'errors' => ['username' => ['Username already taken.']],
         'data' => $data // Pass back the input data to pre-fill the form
@@ -209,9 +150,18 @@ class AuthController extends BaseController
 
     // Hash the password and register user
     $hashedPassword = password_hash($data['password'], PASSWORD_DEFAULT);
-    $userId = $this->userModel->registerUser($data['username'], $data['email'], $data['full_name'], $hashedPassword, $profilePicturePath, $data['city'], $data['country']);
+    $userId = $this->userModel->registerUser(
+      $data['username'],
+      $data['email'],
+      $data['full_name'],
+      $hashedPassword,
+      $profilePicturePath,
+      $data['city'],
+      $data['country']
+    );
     if (!$userId) {
       $this->addCsrfToView($request);
+
       return $this->view->render($response, 'auth/register.twig', [
         'errors' => ['general' => ['Registration failed. Please try again.']],
         'data' => $data // Pass back the input data to pre-fill the form
@@ -227,6 +177,7 @@ class AuthController extends BaseController
       'is_admin' => false
     ];
 
+    $this->flash->addMessage('success', 'registered_successfully');
     // Redirect to home or profile
     return $response->withHeader('Location', '/')->withStatus(302);
   }
@@ -304,8 +255,11 @@ class AuthController extends BaseController
 
     // Hash the password and register user
     $hashedPassword = !empty($data['password']) ? password_hash($data['password'], PASSWORD_DEFAULT) : NULL;
-
-    $userId = $this->userModel->updateProfile($id, $profilePicturePath, $hashedPassword);
+    $userId = $this->userModel->updateProfile(
+      $id,
+      $profilePicturePath,
+      $hashedPassword
+    );
 
     if (!$userId) {
       $this->addCsrfToView($request);
@@ -317,9 +271,8 @@ class AuthController extends BaseController
 
     // Optionally log in the new user immediately
     $_SESSION['user']['profile_picture'] = $profilePicturePath;
-    ;
 
-    $this->flash->addMessage('success', 'Profile Updated Successfully');
+    $this->flash->addMessage('success', 'profile_updated');
     // Redirect to home or profile
     return $response->withHeader('Location', '/update-profile')->withStatus(302);
   }

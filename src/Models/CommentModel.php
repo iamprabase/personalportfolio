@@ -119,26 +119,38 @@ class CommentModel extends BaseModel
   /**
    * Get paginated comments with user and article information
    */
-  public function getPaginatedComments(int $page, int $perPage): array
+  public function getPaginatedComments(int $page, int $perPage, ?int $article_id = null): array
   {
     try {
       $offset = ($page - 1) * $perPage;
+
       $query = "SELECT u.username as publisher, 
-                            a.title as article_title, 
-                            c.id,
-                            c.comment_text,
-                            c.comment_date,
-                            c.user_id,
-                            c.article_id
-                     FROM comments c
-                     LEFT JOIN users u ON c.user_id = u.id 
-                     LEFT JOIN articles a ON a.id = c.article_id 
-                     ORDER BY c.comment_date DESC 
-                     LIMIT :limit OFFSET :offset";
+                      a.title as article_title, 
+                      c.id,
+                      c.comment_text,
+                      c.comment_date,
+                      c.user_id,
+                      c.article_id
+                FROM comments c
+                LEFT JOIN users u ON c.user_id = u.id 
+                LEFT JOIN articles a ON a.id = c.article_id ";
+
+      if ($article_id !== null) {
+        $query .= "WHERE c.article_id = :article_id ";
+      }
+
+      $query .= "ORDER BY c.comment_date DESC 
+                LIMIT :limit OFFSET :offset";
 
       $stmt = $this->pdo->prepare($query);
+
+      if ($article_id !== null) {
+        $stmt->bindValue(':article_id', $article_id, PDO::PARAM_INT);
+      }
+
       $stmt->bindValue(':limit', $perPage, PDO::PARAM_INT);
       $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
+
       $stmt->execute();
 
       return $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -148,14 +160,20 @@ class CommentModel extends BaseModel
     }
   }
 
+
   /**
    * Get total number of comments
    */
-  public function getTotalComments(): int
+  public function getTotalComments(?int $articleId = null): int
   {
     try {
-      return (int) $this->pdo->query("SELECT COUNT(*) FROM comments")
-        ->fetchColumn();
+      if ($articleId !== null) {
+        $stmt = $this->pdo->prepare("SELECT COUNT(*) FROM comments WHERE article_id = :article_id");
+        $stmt->execute([':article_id' => $articleId]);
+        return (int) $stmt->fetchColumn();
+      } else {
+        return (int) $this->pdo->query("SELECT COUNT(*) FROM comments")->fetchColumn();
+      }
     } catch (PDOException $e) {
       error_log("Error counting comments: " . $e->getMessage());
       throw $e;

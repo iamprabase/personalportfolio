@@ -126,6 +126,35 @@ class AdminController extends BaseController
   }
 
   /**
+   * Return List comments
+   */
+  public function fetchComments(ServerRequestInterface $request, ResponseInterface $response, array $args): ResponseInterface
+  {
+    $queryParams = $request->getQueryParams();
+    $article_id = $args['article_id'];
+    $page = isset($queryParams['page']) ? (int) $queryParams['page'] : 1;
+    $perPage = $totalComments = $this->commentModel->getTotalComments($article_id);
+
+    $comments = $this->commentModel->getPaginatedComments($page, $perPage, $article_id);
+
+    $totalPages = $totalComments > 0 ? ceil($totalComments / $perPage) : 0;
+
+    $this->addCsrfToView($request);
+
+    return $this->view->render($response, 'admin/comments.twig', [
+      'comments' => $comments,
+      'currentPage' => $page,
+      'totalPages' => $totalPages,
+      'page' => [
+        'meta_title' => self::$config['meta_title'],
+        'meta_description' => self::$config['meta_description'],
+        'canonical_url' => self::$config['canonical_url'],
+        'language' => self::$config['language'],
+      ],
+    ]);
+  }
+
+  /**
    * Return Admin dashboard page
    */
   public function dashboard(ServerRequestInterface $request, ResponseInterface $response): ResponseInterface

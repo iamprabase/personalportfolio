@@ -22,7 +22,10 @@
                 <tbody>
               {% for article in articles %}
                 <tr class="gradeX">
-                  <td>{{article.title}}</td>
+                  <td>
+                    <a href="/admin/comments/{{ article.id }}">{{ article.title }}</a>
+                  </td>
+                  
                   <td>{{article.content | striptags | slice(0, 150) ~ '...'  }}</td>
                   <td>{{article.publisher}}</td>
                   <td>{{article.publication_date|date("F j, Y") }}</td>

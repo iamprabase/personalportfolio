@@ -73,6 +73,24 @@ return [
   'add_new_user' => 'List Users',
   'comment_publisher' => 'Commented By',
 
+
+  'profile_updated' => 'Profile Updated Successfully',
+  'registered_successfully' => 'User Registered Successfully',
+  'login_successfully' => 'User Logged In Successfully',
+  // 'login_failed' => 'Login Failed',
+  // 'article_added_successfully' => 'Article Added Successfully',
+  // 'article_updated_successfully' => 'Article Updated Successfully',
+  // 'article_deleted_successfully' => 'Article Deleted Successfully',
+  // 'comment_added_successfully' => 'Comment Added Successfully',
+  // 'comment_updated_successfully' => 'Comment Updated Successfully',
+  // 'comment_deleted_successfully' => 'Comment Deleted Successfully',
+  // 'page_added_successfully' => 'Page Added Successfully',
+  // 'page_updated_successfully' => 'Page Updated Successfully',
+  // 'page_deleted_successfully' => 'Page Deleted Successfully',
+  // 'user_added_successfully' => 'User Added Successfully',
+  // 'user_updated_successfully' => 'User Updated Successfully',
+  // 'user_deleted_successfully' => 'User Deleted Successfully',
+
   // 'featured_posts' => 'Featured Posts',
   // 'contact_us' => 'Contact Us',
 

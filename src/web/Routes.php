@@ -48,6 +48,16 @@ return function (App $app) {
   $app->get('/register', [AuthController::class, 'showRegister']);
   $app->post('/register', [AuthController::class, 'register']);
 
+  $app->group('/admin', function ($group) {
+    $group->get('/login', [AuthController::class, 'showLogin']);
+    $group->post('/login', [AuthController::class, 'login']);
+    $group->get('/get-image-folders', [ImageController::class, 'folders']);
+    $group->get('/get-images/{folder}', [ImageController::class, 'imagesInFolder']);
+    $group->get('/get-images', [ImageController::class, 'index']);
+    $group->post('/upload-image', [ImageController::class, 'uploadImage']);
+
+  });
+
   // Comment: Article Comments
   // Admin Routes (protected by AuthMiddleware)
   $app->group('', function ($group) {
@@ -58,15 +68,6 @@ return function (App $app) {
     $group->post('/comments/{id}/update', [CommentController::class, 'update']);
     $group->post('/comments/{id}/delete', [CommentController::class, 'delete']);
   })->add(new AuthMiddleware());
-
-
-  $app->group('/admin', function ($group) {
-    $group->get('/login', [AuthController::class, 'showAdminLogin']);
-    $group->post('/login', [AuthController::class, 'adminLogin']);
-    $group->get('/register', [AuthController::class, 'showAdminRegister']);
-    $group->post('/register', [AuthController::class, 'adminRegister']);
-    $group->get('/get-images', [ImageController::class, 'index']);
-  });
 
   // Admin Routes (protected by AdminMiddleware)
   $app->group('/admin', function ($group) {
@@ -85,19 +86,7 @@ return function (App $app) {
     $group->post('/page/edit/{id}', [AdminController::class, 'updatePage']);
     $group->post('/article/delete/{id}', [AdminController::class, 'delete']);
     $group->post('/page/delete/{id}', [AdminController::class, 'deletePage']);
+    $group->get('/comments/{article_id}', [AdminController::class, 'fetchComments']);
   })->add(new AdminMiddleware());
 
 };
-
-
-// <?php
-// namespace App\Routes;
-
-// use Slim\App;
-// use App\Utils\RouteManager;
-
-// // Usage
-// return function (App $app) {
-//   $routeManager = new RouteManager($app);
-//   $routeManager->registerRoutes();
-// };
