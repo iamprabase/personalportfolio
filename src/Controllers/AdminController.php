@@ -203,22 +203,25 @@ class AdminController extends BaseController
     ];
 
     if ($data['featured_image'] && $data['featured_image']->getError() === UPLOAD_ERR_OK) {
-      $rules['featured_image'] = 'file|mimes:jpeg,jpg,png|max:2048';
+      $rules['featured_image'] = 'file|mimes:jpeg,jpg,png|size:2048';
     }
 
     $validator = new Validator();
+
+    $data['content'] = preg_replace('#(\.\./)+uploads#', '/uploads', $data['content']);
+
     if (!$validator->validate($data, $rules)) {
       $this->addCsrfToView($request);
       $errors = $validator->getErrors();
+
       return $this->view->render($response, 'admin/article_form.twig', [
         'errors' => $errors,
-        'article' => $data
+        'article' => []
       ]);
     }
 
     $featuredImagePath = $this->handleFileUpload($data['featured_image'], 'article_featured_images');
     $slug = (new Slugify())->slugify($data['title']);
-
     $this->articleModel->createArticle($data['title'], $data['content'], $slug, $featuredImagePath, $data['post_type']);
 
     $this->flash->addMessage('success', 'Article created successfully!');
@@ -257,13 +260,16 @@ class AdminController extends BaseController
     }
 
     $validator = new Validator();
+    $data['content'] = preg_replace('#(\.\./)+uploads#', '/uploads', $data['content']);
+
     if (!$validator->validate($data, $rules)) {
       $this->addCsrfToView($request);
       $errors = $validator->getErrors();
       $article = $this->articleModel->getArticleById($id);
+
       return $this->view->render($response, 'admin/article_form.twig', [
         'errors' => $errors,
-        'article' => array_merge($article, $data)
+        'article' => []
       ]);
     }
 
@@ -342,6 +348,8 @@ class AdminController extends BaseController
 
     $slug = (new Slugify())->slugify($data['title']);
 
+    $data['content'] = preg_replace('#(\.\./)+uploads#', '/uploads', $data['content']);
+
     $this->pageModel->createPage($data['title'], $data['content'], $slug, $data['page_parent']);
 
     $this->flash->addMessage('success', 'Page created successfully!');
@@ -386,6 +394,7 @@ class AdminController extends BaseController
 
     $page = $this->pageModel->getPageById($id);
     $slug = (new Slugify())->slugify($data['title']);
+    $data['content'] = preg_replace('#(\.\./)+uploads#', '/uploads', $data['content']);
 
     $this->pageModel->updatePage($id, $data['title'], $data['content'], $slug, $data['page_parent']);
 

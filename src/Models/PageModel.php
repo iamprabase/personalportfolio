@@ -150,8 +150,7 @@ class PageModel extends BaseModel
                    SET title = :title, 
                        content = :content, 
                        slug = :slug, 
-                       page_parent_id = :page_parent_id,
-                       updated_at = NOW()
+                       page_parent_id = :page_parent_id
                    WHERE id = :id";
 
       $params = [
