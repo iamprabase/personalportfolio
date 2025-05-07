@@ -53,8 +53,8 @@ return function (App $app) {
     $group->post('/login', [AuthController::class, 'login']);
     $group->get('/get-image-folders', [ImageController::class, 'folders']);
     $group->get('/get-images/{folder}', [ImageController::class, 'imagesInFolder']);
-    $group->get('/get-images', [ImageController::class, 'index']);
     $group->post('/upload-image', [ImageController::class, 'uploadImage']);
+    $group->post('/upload-images', [ImageController::class, 'uploadImages']);
 
   });
 

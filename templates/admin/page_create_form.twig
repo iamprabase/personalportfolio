@@ -310,6 +310,13 @@
           <button class="close-btn">&times;</button>
         </div>
         <div class="modal-body">
+          <div class="upload-section">
+            <input type="text" id="newFolder" placeholder="New folder (optional)" />
+            <select id="existingFolder"></select>
+            <input type="file" id="imageFile" />
+            <button id="uploadBtn">Upload</button>
+          </div>
+          <hr>
           <div class="image-grid" id="imageGrid"><p>Loading folders...</p></div>
         </div>
       </div>
@@ -323,7 +330,15 @@
       fetch('/admin/get-image-folders')
         .then(res => res.json())
         .then(folders => {
-          console.log('Folders received:', folders);
+          const existingFolderSelect = document.getElementById('existingFolder');
+          existingFolderSelect.innerHTML = '<option value="">--Select existing--</option>';
+
+          folders.forEach(folder => {
+            const option = document.createElement('option');
+            option.value = folder;
+            option.textContent = folder;
+            existingFolderSelect.appendChild(option);
+          });
 
           imageGrid.innerHTML = '';
           folders.forEach(folder => {
@@ -373,6 +388,48 @@
 
     // Attach close event
     imageBrowserModal.querySelector('.close-btn').onclick = closeModal;
+
+
+
+  document.getElementById('uploadBtn').onclick = () => {
+    const fileInput = document.getElementById('imageFile');
+    const selectedFile = fileInput.files[0];
+    if (!selectedFile) {
+      alert("Please select an image to upload.");
+      return;
+    }
+
+    const newFolder = document.getElementById('newFolder').value.trim();
+    const existingFolder = document.getElementById('existingFolder').value;
+    const folder = newFolder || existingFolder;
+
+    if (!folder) {
+      alert("Please specify or select a folder.");
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append('image', selectedFile);
+    formData.append('folder', folder);
+    // Get the CSRF token from the page (make sure it is available)
+    formData.append(csrfTokenKey, csrfTokenKeyValue);
+    formData.append(csrfTokenValueKey, csrfTokenValueValue);
+
+
+    fetch('/admin/upload-images', {
+      method: 'POST',
+      body: formData
+    })
+      .then(res => res.json())
+      .then(result => {
+        alert("Image uploaded!");
+        loadImagesInFolder(folder);
+      })
+      .catch(err => {
+        console.error(err);
+        alert("Failed to upload image.");
+      });
+  };
 
     // Start by loading folders
     loadFolders();

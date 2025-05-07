@@ -6,62 +6,51 @@ use Psr\Http\Message\ServerRequestInterface;
 class ImageController
 {
 
-  // Home page: list all articles
-  public function index(ServerRequestInterface $request, ResponseInterface $response): ResponseInterface
+  public function uploadImages(ServerRequestInterface $request, ResponseInterface $response): ResponseInterface
   {
-    $baseDir = dirname(__DIR__, 2) . DIRECTORY_SEPARATOR . 'public' . DIRECTORY_SEPARATOR . 'uploads' . DIRECTORY_SEPARATOR;
-    $imageData = [];
+    $uploadedFiles = $request->getUploadedFiles();
+    $parsedBody = $request->getParsedBody();
+    $folder = basename($parsedBody['folder'] ?? '');
+
+    if (empty($folder)) {
+      return $response->withStatus(400)->withHeader('Content-Type', 'application/json')
+        ->write(json_encode(['error' => 'Folder name required.']));
+    }
+
+    $image = $uploadedFiles['image'] ?? null;
+    if (!$image || $image->getError() !== UPLOAD_ERR_OK) {
+      return $response->withStatus(400)->withHeader('Content-Type', 'application/json')
+        ->write(json_encode(['error' => 'Invalid image upload.']));
+    }
+
+    // Ensure upload path exists
+    $uploadDir = dirname(__DIR__, 2) . '/public/uploads/' . $folder;
+    if (!is_dir($uploadDir)) {
+      mkdir($uploadDir, 0755, true);
+    }
+
+    // Generate safe and unique filename
+    $extension = pathinfo($image->getClientFilename(), PATHINFO_EXTENSION);
+    $safeName = bin2hex(random_bytes(10)) . '.' . $extension;
+    $destination = $uploadDir . '/' . $safeName;
 
     try {
-      // Scan the uploads directory for folders
-      $directories = scandir($baseDir);
-      foreach ($directories as $folder) {
-        if ($folder === '.' || $folder === '..')
-          continue;
-
-        $folderPath = $baseDir . $folder;
-        if (is_dir($folderPath)) {
-          $images = [];
-
-          $files = scandir($folderPath);
-          foreach ($files as $file) {
-            if ($file === '.' || $file === '..')
-              continue;
-
-            $filePath = $folderPath . DIRECTORY_SEPARATOR . $file;
-            if (is_file($filePath)) {
-              $ext = strtolower(pathinfo($file, PATHINFO_EXTENSION));
-              if (in_array($ext, ['jpg', 'jpeg', 'png', 'gif'])) {
-                $images[] = [
-                  'name' => $file,
-                  'url' => '/public/uploads/' . $folder . '/' . $file,
-                  'size' => filesize($filePath),
-                  'modified' => filemtime($filePath)
-                ];
-              }
-            }
-          }
-
-          if (!empty($images)) {
-            usort($images, fn($a, $b) => $b['modified'] - $a['modified']);
-          }
-
-          $imageData[] = [
-            'folder' => $folder,
-            'images' => $images
-          ];
-        }
-      }
-
-      $response->getBody()->write(json_encode($imageData));
-      return $response->withHeader('Content-Type', 'application/json');
-
-    } catch (Exception $e) {
-      $errorResponse = ['error' => $e->getMessage()];
-      $response->getBody()->write(json_encode($errorResponse));
-      return $response->withHeader('Content-Type', 'application/json')->withStatus(500);
+      $image->moveTo($destination);
+    } catch (\RuntimeException $e) {
+      return $response->withStatus(500)->withHeader('Content-Type', 'application/json')
+        ->write(json_encode(['error' => 'Error moving uploaded file: ' . $e->getMessage()]));
     }
+
+    // Construct URL to return
+    $publicUrl = "/uploads/{$folder}/{$safeName}";
+    $response->getBody()->write(json_encode([
+      'status' => 'success',
+      'url' => $publicUrl,
+      'name' => $safeName
+    ]));
+    return $response->withHeader('Content-Type', 'application/json');
   }
+
 
   public function folders(ServerRequestInterface $request, ResponseInterface $response): ResponseInterface
   {
