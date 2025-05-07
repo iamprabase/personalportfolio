@@ -2,10 +2,10 @@
 
 namespace App\Controllers;
 
-use App\Utils\Validator;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use App\Models\PageModel;
+use App\Utils\Validator;
 use Slim\Csrf\Guard;
 
 class PageController extends BaseController
@@ -36,7 +36,7 @@ class PageController extends BaseController
     $page = $this->pageModel->getPageBySlug($slug);
 
     if ($page) {
-      return $this->view->render($response, 'pages/show.twig', [
+      return $this->view->render($response, 'frontend/pages/show.twig', [
         'page' => $page,
       ]);
     }

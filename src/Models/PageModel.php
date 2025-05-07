@@ -19,7 +19,31 @@ class PageModel extends BaseModel
 
       $stmt = $this->pdo->prepare($sql);
       $stmt->execute();
-      return $stmt->fetchAll(PDO::FETCH_ASSOC);
+      $pages = $stmt->fetchAll(PDO::FETCH_ASSOC);
+      
+      // Create pages tree structure
+      $pagesTree = [];
+      $childPages = [];
+      
+      // First separate parent and child pages
+      foreach($pages as $page) {
+        if(!$page['page_parent_id']) {
+          $pagesTree[$page['id']] = $page;
+          $pagesTree[$page['id']]['children'] = [];
+        } else {
+          $childPages[] = $page;
+        }
+      }
+      
+      // Then assign child pages to their parents
+      foreach($childPages as $child) {
+        if(isset($pagesTree[$child['page_parent_id']])) {
+          $pagesTree[$child['page_parent_id']]['children'][] = $child;
+        }
+      }
+      
+      return array_values($pagesTree);
+      
     } catch (PDOException $e) {
       error_log("Error fetching all pages: " . $e->getMessage());
       throw $e;

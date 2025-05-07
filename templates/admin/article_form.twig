@@ -117,7 +117,7 @@
                         <div class="formRow">
                             <label>{{trans('post_display_position')}}</label>
                             <div class="formRight">
-                                <select class="form-control fh5co_text_select_option" name="post_type" onchange="this.form.submit()">
+                                <select class="form-control fh5co_text_select_option" name="post_type">
                                     <option value="my_recent_publications" {% if 'my_recent_publications' is same as article.type %} selected {% endif %}>{{ trans('my_recent_publications') }}</option>
                                     <option value="home_page" {% if 'home_page' is same as article.post_type %} selected {% endif %}>{{ trans('home_page') }}</option>
                                     <option value="member_publications" {% if 'member_publications' is same as article.post_type %} selected {% endif %}>{{ trans('member_publications') }}</option>

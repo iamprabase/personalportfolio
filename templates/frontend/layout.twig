@@ -151,6 +151,25 @@
             <li class="nav-item">
               <a class="nav-link" href="Contact_us.html">{{trans('media')}}</a>
             </li> #}
+            {% for page in dynamicPages %}
+              {% if page.children is defined and page.children|length > 0 %}
+                  <li class="nav-item dropdown">
+                      <a class="nav-link dropdown-toggle" href="#" id="dropdownMenu_{{ page.id }}" data-toggle="dropdown"
+                        aria-haspopup="true" aria-expanded="false">
+                          {{ page.title }}
+                      </a>
+                      <div class="dropdown-menu" aria-labelledby="dropdownMenu_{{ page.id }}">
+                          {% for child in page.children %}
+                              <a class="dropdown-item" href="/page/{{ child.slug }}">{{ child.title }}</a>
+                          {% endfor %}
+                      </div>
+                  </li>
+              {% else %}
+                  <li class="nav-item">
+                      <a class="nav-link" href="/page/{{ page.slug }}">{{ page.title }}</a>
+                  </li>
+              {% endif %}
+            {% endfor %}
           </ul>
         </div>
       </nav>

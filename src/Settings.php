@@ -69,4 +69,12 @@ return function ($container) {
     $controller->setFlash($container->get(Messages::class));
     return $controller;
   });
+
+  // In your container configuration, set up the controller:
+  $container->set(\App\Controllers\PageController::class, function ($container) {
+    $controller = new \App\Controllers\PageController($container->get('csrf'));
+    $controller->setView($container->get('view'));  // 'view' is registered as Twig in the container.
+    $controller->setFlash($container->get(Messages::class));
+    return $controller;
+  });
 };

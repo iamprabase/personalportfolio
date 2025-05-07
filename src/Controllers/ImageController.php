@@ -85,6 +85,20 @@ class ImageController
     $folder = basename($args['folder']); // Prevent path traversal
     $baseDir = dirname(__DIR__, 2) . '/public/uploads/' . $folder;
 
+
+    $uploadDir = dirname(__DIR__, 2) . '/public/uploads/';
+    $uri = $request->getUri();
+
+    $scheme = $uri->getScheme();              // http or https
+    $host = $uri->getHost();                  // e.g., localhost or domain.com
+    $port = $uri->getPort();                  // optional: 8080, etc.
+    $basePath = $request->getUri()->getPath(); // gives full path (optional)
+
+    $baseUrl = $scheme . '://' . $host . ($port ? ':' . $port : '');
+
+    // Final uploads URL:
+    $baseDir = $baseUrl . '/uploads/' . $folder;
+
     $images = [];
     if (is_dir($baseDir)) {
       foreach (scandir($baseDir) as $file) {
@@ -127,6 +141,17 @@ class ImageController
 
     // Define the upload directory
     $uploadDir = dirname(__DIR__, 2) . '/public/uploads/';
+    $uri = $request->getUri();
+
+    $scheme = $uri->getScheme();              // http or https
+    $host = $uri->getHost();                  // e.g., localhost or domain.com
+    $port = $uri->getPort();                  // optional: 8080, etc.
+    $basePath = $request->getUri()->getPath(); // gives full path (optional)
+
+    $baseUrl = $scheme . '://' . $host . ($port ? ':' . $port : '');
+
+    // Final uploads URL:
+    $uploadDir = $baseUrl . '/uploads/';
     if (!is_dir($uploadDir)) {
       mkdir($uploadDir, 0777, true);
     }
